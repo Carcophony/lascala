@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaScala — How to Play</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@300;400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0d12;
+    --bg2: #161520;
+    --bg3: #1c1a28;
+    --gold: #c9a84c;
+    --gold2: #f0c84a;
+    --gold-dim: #6a5820;
+    --green: #27ae60;
+    --red: #c0392b;
+    --blue: #2980b9;
+    --text: #e8e2d4;
+    --text-mid: #9a9080;
+    --border: #2a2838;
+    --card: #18172288;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    line-height: 1.7;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 30px;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,168,76,0.08) 0%, transparent 70%),
+      var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(201,168,76,0.02) 80px, rgba(201,168,76,0.02) 81px),
+      repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(201,168,76,0.02) 80px, rgba(201,168,76,0.02) 81px);
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 20vw, 180px);
+    letter-spacing: 0.12em;
+    line-height: 1;
+    background: linear-gradient(135deg, #6a5020 0%, #c9a84c 35%, #f5d060 50%, #c9a84c 65%, #6a5020 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    filter: drop-shadow(0 0 40px rgba(201,168,76,0.25));
+  }
+
+  .hero-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--text-mid);
+    margin: 12px 0 40px;
+    position: relative;
+  }
+
+  .hero-intro {
+    max-width: 620px;
+    font-size: 17px;
+    color: var(--text);
+    line-height: 1.9;
+    position: relative;
+    margin-bottom: 48px;
+  }
+
+  .hero-intro strong { color: var(--gold); }
+
+  .hero-cta {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold), var(--gold-dim));
+    color: var(--bg);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.2em;
+    padding: 14px 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    position: relative;
+    transition: all 0.25s;
+    box-shadow: 0 4px 24px rgba(201,168,76,0.25);
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 40px rgba(201,168,76,0.4);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--gold-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 80px 30px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 46px;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .section-title span { color: var(--gold); }
+
+  p { margin-bottom: 16px; font-size: 16px; color: #b0a898; line-height: 1.8; }
+  p strong { color: var(--text); font-weight: 700; }
+
+  /* ── VISUAL LADDER ── */
+  .ladder-demo {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    margin: 40px 0;
+    align-items: flex-start;
+  }
+
+  .ladder-visual {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 3px;
+    width: 180px;
+    flex-shrink: 0;
+  }
+
+  .lv-rung {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 5px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .lv-rung.top { background: linear-gradient(90deg,#162616,#0d2016); border-color: var(--green); }
+  .lv-rung.bottom { opacity: 0.5; }
+  .lv-rung.here { background: linear-gradient(90deg,#1a1508,#26200a); border-color: var(--gold); box-shadow: 0 0 14px rgba(201,168,76,0.3); }
+
+  .lv-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--text-mid);
+    width: 24px;
+    text-align: right;
+  }
+
+  .lv-rung.top .lv-num { color: var(--green); }
+  .lv-rung.here .lv-num { color: var(--gold); }
+
+  .lv-bar { flex: 1; height: 2px; background: var(--border); border-radius: 2px; }
+  .lv-rung.top .lv-bar { background: var(--green); }
+  .lv-rung.here .lv-bar { background: var(--gold); }
+
+  .lv-tok {
+    font-size: 20px;
+    width: 26px;
+    text-align: center;
+  }
+
+  /* ── STEP CARDS ── */
+  .steps { display: flex; flex-direction: column; gap: 20px; margin: 30px 0; }
+
+  .step {
+    display: flex;
+    gap: 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    align-items: flex-start;
+    transition: all 0.2s;
+  }
+
+  .step:hover {
+    border-color: var(--gold-dim);
+    background: #1a190e;
+  }
+
+  .step-num {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    color: var(--bg);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-body h4 {
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .step-body p { font-size: 14px; margin: 0; }
+
+  /* ── DICE EXPLAINER ── */
+  .dice-explainer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 30px;
+    margin: 30px 0;
+  }
+
+  @media(max-width:500px) {
+    .dice-explainer { grid-template-columns: 1fr; }
+    .dice-arr { transform: rotate(90deg); }
+  }
+
+  .dice-box {
+    background: var(--bg3);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 52px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .dice-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--text-mid);
+    text-transform: uppercase;
+  }
+
+  .dice-arr { font-size: 30px; color: var(--gold-dim); }
+
+  .dice-result-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--gold2);
+    line-height: 1;
+  }
+
+  .dice-result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+  }
+
+  /* ── OUTCOMES ── */
+  .outcome-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 30px 0; }
+  @media(max-width:500px) { .outcome-cards { grid-template-columns: 1fr; } }
+
+  .outcome-card {
+    border-radius: 10px;
+    padding: 24px;
+    border: 2px solid;
+    text-align: center;
+  }
+
+  .outcome-card.win { background: #0d1f10; border-color: var(--green); }
+  .outcome-card.lose { background: #1a0d0d; border-color: var(--red); }
+
+  .outcome-icon { font-size: 48px; margin-bottom: 12px; }
+  .outcome-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.12em; margin-bottom: 8px; }
+  .outcome-card.win .outcome-title { color: var(--green); }
+  .outcome-card.lose .outcome-title { color: var(--red); }
+  .outcome-body { font-size: 13px; color: var(--text-mid); line-height: 1.7; }
+
+  /* ── BETS TABLE ── */
+  .bets-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+
+  .bets-table th {
+    background: var(--bg3);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bets-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #1e1c2a;
+    color: #b0a898;
+  }
+
+  .bets-table tr:hover td { background: #1a192a; color: var(--text); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+  }
+
+  .tag-gold { background: #261e08; color: var(--gold); }
+  .tag-green { background: #0d1f10; color: var(--green); }
+  .tag-blue { background: #0d1420; color: #5ba3d0; }
+
+  /* ── HEDGE EXPLAINER ── */
+  .hedge-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 24px 0;
+    position: relative;
+  }
+
+  .hedge-timeline::before {
+    content: '';
+    position: absolute;
+    left: 22px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--gold-dim), var(--border));
+  }
+
+  .hedge-event {
+    display: flex;
+    gap: 20px;
+    padding: 16px 0;
+    align-items: flex-start;
+  }
+
+  .hedge-dot {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hedge-text h4 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .hedge-text p { font-size: 13px; margin: 0; }
+
+  .hedge-money {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  /* ── FAQ ── */
+  .faq-list { display: flex; flex-direction: column; gap: 2px; margin: 20px 0; }
+
+  .faq-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .faq-q {
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+
+  .faq-q::after { content: '+'; color: var(--gold); font-size: 20px; font-weight: 300; }
+  .faq-item.open .faq-q::after { content: '−'; }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 20px;
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.8;
+  }
+
+  .faq-item.open .faq-a { max-height: 300px; padding: 0 20px 16px; }
+
+  /* ── QUICK REFERENCE ── */
+  .quick-ref {
+    background: linear-gradient(135deg, #0e0d12, #161428);
+    border: 1px solid var(--gold-dim);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 40px 0;
+  }
+
+  .qr-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .qr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:500px) { .qr-grid { grid-template-columns: 1fr; } }
+
+  .qr-item { display: flex; gap: 10px; align-items: flex-start; }
+  .qr-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .qr-text { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+  .qr-text strong { color: var(--text); font-size: 14px; display: block; margin-bottom: 2px; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Matchless Games</div>
+  <div class="hero-title">LaScala</div>
+  <div class="hero-sub">How to Play — The Complete Guide</div>
+  <div class="hero-intro">
+    Two dice. One ladder. Pure edge-of-your-seat tension on every single throw.<br>
+    LaScala is <strong>simple enough to learn in two minutes</strong>, rich enough to obsess over for years.
+  </div>
+  <a href="#start" class="hero-cta">SHOW ME HOW</a>
+  <div class="scroll-hint">↓ Scroll to learn</div>
+</div>
+
+<!-- SECTION 1: THE IDEA -->
+<div class="section" id="start">
+  <div class="section-badge">① The Big Idea</div>
+  <div class="section-title">One Shooter.<br>One <span>Ladder</span>. One Goal.</div>
+
+  <p>Forget the sum of the dice — we don't care about that. In LaScala, what matters is the <strong>difference</strong>. The gap between the two numbers. That one small twist turns a familiar thing into something completely new.</p>
+
+  <p>Someone takes the role of <strong>Dice Shooter</strong>. They start somewhere on a numbered ladder and throw the dice, over and over, trying to climb to the top. Everyone else bets on whether they'll make it — or crash out.</p>
+
+  <p>The ladder looks like this:</p>
+
+  <div class="ladder-demo">
+    <div>
+      <div class="ladder-visual">
+        <div class="lv-rung bottom"><span class="lv-num">0</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung"><span class="lv-num">1</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung"><span class="lv-num">2</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung"><span class="lv-num">3</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung"><span class="lv-num">4</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung here"><span class="lv-num">5</span><div class="lv-bar"></div><span class="lv-tok">🎲</span></div>
+        <div class="lv-rung"><span class="lv-num">6</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung"><span class="lv-num">7</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung"><span class="lv-num">8</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung"><span class="lv-num">9</span><div class="lv-bar"></div><span class="lv-tok"></span></div>
+        <div class="lv-rung top"><span class="lv-num">10</span><div class="lv-bar"></div><span class="lv-tok">🏆</span></div>
+      </div>
+    </div>
+    <div style="max-width:320px; padding-top:20px">
+      <p>The shooter starts at <strong style="color:var(--gold)">position 5</strong> (their choice). They need to reach <strong style="color:var(--green)">position 10</strong> exactly.</p>
+      <p>On every throw, they move <strong>up</strong> by whatever the dice show as their difference. If they overshoot the top, they bounce back down.</p>
+      <p>If they roll a double at any point — <strong style="color:var(--red)">game over</strong>. They failed. The game can end on any single throw. That's the tension.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: THE DICE -->
+<div class="section">
+  <div class="section-badge">② The Dice</div>
+  <div class="section-title">It's the <span>Difference</span> That Counts</div>
+
+  <p>Two normal dice. Throw them. Ignore the total. What matters is the gap — the bigger number minus the smaller. That's your move.</p>
+
+  <div class="dice-explainer">
+    <div>
+      <div class="dice-box">⚄</div>
+      <div class="dice-label">Die One · 5</div>
+    </div>
+    <div class="dice-arr">−</div>
+    <div>
+      <div class="dice-box">⚂</div>
+      <div class="dice-label">Die Two · 3</div>
+    </div>
+    <div class="dice-arr">=</div>
+    <div>
+      <div class="dice-result-big">2</div>
+      <div class="dice-result-label">Move 2 rungs</div>
+    </div>
+  </div>
+
+  <p>The difference can only ever be <strong>0, 1, 2, 3, 4, or 5</strong>. And here's the thing — <strong>zero means doubles</strong>. Both dice the same number. That ends the game instantly. No move. Game over.</p>
+
+  <p>This happens <strong>1 in 6 throws</strong>. Every single throw, there's a one-in-six chance of sudden death. That's what makes every throw electric.</p>
+</div>
+
+<!-- SECTION 3: HOW A GAME GOES -->
+<div class="section">
+  <div class="section-badge">③ How to Play</div>
+  <div class="section-title">Step by Step</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Pick a Shooter</h4>
+        <p>One player is the Dice Shooter for the round. Everyone else bets against or alongside them. The shooter role rotates each game so everyone gets a turn.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Choose a Start Position</h4>
+        <p>The shooter picks where to start on the ladder. Start low (closer to 1) for a longer, more dramatic game with bigger odds. Start high (closer to the top) for a quick game with lower odds.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Place Your Bets</h4>
+        <p>Before each throw, everyone bets. You can bet that the shooter will <strong>Make It</strong> to the top, that they <strong>Won't Make It</strong>, or you can bet on exactly what the <strong>next throw's difference</strong> will be (0–5). You can do all of these.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Throw the Dice</h4>
+        <p>Shooter throws two dice. The difference determines the move. Throw bets pay out immediately. Make It / Don't Make It bets stay active until the game ends.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Move the Shooter (or End the Game)</h4>
+        <p>If it's a double (zero): game over, shooter loses. If they land exactly on top: shooter wins. If they overshoot, they bounce back. Otherwise: bet again, throw again.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Outcomes -->
+  <div class="outcome-cards">
+    <div class="outcome-card win">
+      <div class="outcome-icon">🏆</div>
+      <div class="outcome-title">MADE IT!</div>
+      <div class="outcome-body">
+        Shooter lands <strong>exactly</strong> on the top rung.<br>
+        <em>Make It</em> bets pay out.<br>
+        <em>Don't Make It</em> bets lose.
+      </div>
+    </div>
+    <div class="outcome-card lose">
+      <div class="outcome-icon">💀</div>
+      <div class="outcome-title">WIPED OUT</div>
+      <div class="outcome-body">
+        Shooter rolls a <strong>double</strong> (any point).<br>
+        <em>Don't Make It</em> bets pay out.<br>
+        <em>Make It</em> bets lose.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: THE BETS -->
+<div class="section">
+  <div class="section-badge">④ Your Bets</div>
+  <div class="section-title">What You Can <span>Bet On</span></div>
+
+  <p>You can bet on multiple things at once, on every throw. This is where it gets interesting.</p>
+
+  <table class="bets-table">
+    <thead>
+      <tr><th>Bet</th><th>What it means</th><th>Pays when</th><th>Type</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Make It</strong></td>
+        <td>Shooter reaches the top exactly</td>
+        <td>Shooter wins the game</td>
+        <td><span class="tag tag-gold">GAME BET</span></td>
+      </tr>
+      <tr>
+        <td><strong>Don't Make It</strong></td>
+        <td>Shooter rolls a double before reaching top</td>
+        <td>Double rolled, game ends</td>
+        <td><span class="tag tag-gold">GAME BET</span></td>
+      </tr>
+      <tr>
+        <td><strong>Diff 0 (Double)</strong></td>
+        <td>Next throw is a double</td>
+        <td>Immediately on that throw</td>
+        <td><span class="tag tag-blue">THROW BET</span></td>
+      </tr>
+      <tr>
+        <td><strong>Diff 1</strong></td>
+        <td>Next throw shows a difference of 1</td>
+        <td>Immediately on that throw</td>
+        <td><span class="tag tag-blue">THROW BET</span></td>
+      </tr>
+      <tr>
+        <td><strong>Diff 2</strong></td>
+        <td>Next throw shows a difference of 2</td>
+        <td>Immediately on that throw</td>
+        <td><span class="tag tag-blue">THROW BET</span></td>
+      </tr>
+      <tr>
+        <td><strong>Diff 3</strong></td>
+        <td>Next throw shows a difference of 3</td>
+        <td>Immediately on that throw</td>
+        <td><span class="tag tag-blue">THROW BET</span></td>
+      </tr>
+      <tr>
+        <td><strong>Diff 4</strong></td>
+        <td>Next throw shows a difference of 4</td>
+        <td>Immediately on that throw</td>
+        <td><span class="tag tag-blue">THROW BET</span></td>
+      </tr>
+      <tr>
+        <td><strong>Diff 5</strong></td>
+        <td>Next throw shows a difference of 5</td>
+        <td>Immediately on that throw</td>
+        <td><span class="tag tag-blue">THROW BET</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>The Throw Bets have fixed odds</strong> — they never change because the dice don't change. Diff 1 (the most common) pays less. Diff 5 (rare) pays a lot more. The odds always reflect the actual probability of each outcome.</p>
+
+  <p><strong>The Game Bets change on every throw</strong> — as the shooter gets closer to the top, "Make It" odds shorten. As they get further away, they lengthen. You can see the market shifting in real time and bet accordingly.</p>
+</div>
+
+<!-- SECTION 5: THE BOUNCE -->
+<div class="section">
+  <div class="section-badge">⑤ The Bounce Rule</div>
+  <div class="section-title">Too Far? <span>Bounce Back.</span></div>
+
+  <p>This is the rule that causes the most drama and confusion — but it's actually very simple.</p>
+
+  <p>If the shooter would land <em>above</em> the top rung, they don't reach the top. Instead, they <strong>bounce back</strong> by the excess. Think of the top as a wall they bounce off.</p>
+
+  <div class="dice-explainer" style="grid-template-columns:1fr;text-align:left;gap:12px">
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px">EXAMPLE — BOUNCE IN ACTION</div>
+      <div style="font-size:14px;color:var(--text-mid);line-height:2">
+        🪜 Ladder top: <strong style="color:var(--text)">10</strong><br>
+        🎲 Shooter is at: <strong style="color:var(--gold)">8</strong><br>
+        🎲 Dice show: <strong style="color:var(--text)">3 and 6 → difference = 3</strong><br>
+        ➕ 8 + 3 = <strong style="color:var(--text)">11</strong> (overshoots by 1)<br>
+        🔁 New position: 10 − 1 = <strong style="color:var(--red)">9</strong> (bounced back!)<br>
+        😬 Shooter now needs exactly <strong style="color:var(--text)">1</strong> to win.
+      </div>
+    </div>
+  </div>
+
+  <p>The bounce rule means that being close to the top is <strong>not the same as being safe</strong>. Near the top, you can be thrown back down by a big throw. And needing exactly 1 is actually quite hard — it only happens on 10 out of 36 throws.</p>
+</div>
+
+<!-- SECTION 6: THE HEDGE -->
+<div class="section">
+  <div class="section-badge">⑥ The Advanced Move</div>
+  <div class="section-title">The <span>Guaranteed Return</span></div>
+
+  <p>This is the feature that makes LaScala genuinely unique among betting games. Because the odds on <em>Make It</em> and <em>Don't Make It</em> change during play, a smart player can sometimes bet both sides and <strong>guarantee a profit regardless of outcome</strong>.</p>
+
+  <p>You don't need to understand the maths for this. Just know it's possible, and watch for the opportunity.</p>
+
+  <div class="hedge-timeline">
+    <div class="hedge-event">
+      <div class="hedge-dot">1</div>
+      <div class="hedge-text">
+        <h4>Early in the game — shooter is far from top</h4>
+        <p>Make It odds are long (say 32/10). You bet <strong style="color:var(--gold)">£100 on Make It</strong>. If they win, you get back £420 total.</p>
+      </div>
+    </div>
+    <div class="hedge-event">
+      <div class="hedge-dot">2</div>
+      <div class="hedge-text">
+        <h4>Game progresses — shooter is near the top</h4>
+        <p>Make It odds have shortened dramatically (now 11/10). Don't Make It odds have lengthened. You bet <strong style="color:var(--red)">£200 on Don't Make It</strong>. If they fail, you get back £420 total.</p>
+      </div>
+    </div>
+    <div class="hedge-event">
+      <div class="hedge-dot">✓</div>
+      <div class="hedge-text">
+        <h4>The guaranteed outcome</h4>
+        <p>You've staked £300 total. You collect £420 <em>no matter what happens</em>. Locked-in profit of £120.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hedge-money">
+    Total Staked: £300 &nbsp;·&nbsp; Guaranteed Return: £420 &nbsp;·&nbsp; Profit: <span style="color:var(--green)">+£120 whatever happens</span>
+  </div>
+
+  <p>This is real mathematics, not a trick. It only works when the odds shift enough during the game. When it does come off, it feels brilliant. You bet both sides and can't lose. That's LaScala's secret weapon.</p>
+</div>
+
+<!-- QUICK REFERENCE -->
+<div class="section">
+  <div class="quick-ref">
+    <div class="qr-title">Quick Reference Card</div>
+    <div class="qr-grid">
+      <div class="qr-item">
+        <div class="qr-icon">🎲</div>
+        <div class="qr-text"><strong>The Difference</strong>Bigger die minus smaller die. Range: 0 to 5.</div>
+      </div>
+      <div class="qr-item">
+        <div class="qr-icon">💀</div>
+        <div class="qr-text"><strong>Double = Game Over</strong>Both dice the same. Difference = 0. Shooter fails instantly.</div>
+      </div>
+      <div class="qr-item">
+        <div class="qr-icon">🏆</div>
+        <div class="qr-text"><strong>Win = Land Exactly on Top</strong>Must hit the top rung precisely. Overshoot = bounce back.</div>
+      </div>
+      <div class="qr-item">
+        <div class="qr-icon">🔁</div>
+        <div class="qr-text"><strong>Bounce Rule</strong>Overshoot the top: bounce back by the excess.</div>
+      </div>
+      <div class="qr-item">
+        <div class="qr-icon">📈</div>
+        <div class="qr-text"><strong>Throw Bets</strong>Bet on the exact difference (0–5). Fixed odds. Pay immediately.</div>
+      </div>
+      <div class="qr-item">
+        <div class="qr-icon">🎯</div>
+        <div class="qr-text"><strong>Game Bets</strong>Make It / Don't Make It. Odds change every throw. Pay at end.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section">
+  <div class="section-badge">⑦ Common Questions</div>
+  <div class="section-title">You <span>Asked</span></div>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can you bet on every throw?</div>
+      <div class="faq-a">Yes. Before every single throw, you can place fresh bets on both the throw outcome (Diff 0–5) and the overall game (Make It / Don't Make It). Your previous game bets stay active — you're just adding to them if you want.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can only the shooter throw the dice?</div>
+      <div class="faq-a">Yes — the Dice Shooter is the designated player for that round. Everyone else is betting on them. The role rotates after each game so everyone gets to shoot.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What happens if the shooter rolls 0, 0, 0, 0... and never moves?</div>
+      <div class="faq-a">Doubles end the game immediately. So if the shooter rolls a double on the very first throw, the game is over in one roll. Don't Make It bets win, Make It bets lose. It's brutal. It's also why the tension is real from throw one.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How long does a game last?</div>
+      <div class="faq-a">It entirely depends. A shooter can be wiped out on the first throw (if they roll a double). Or they can have an epic run of 15+ throws on a long ladder. The average game on a 10-rung ladder from position 5 is roughly 3–5 throws — but the variance is huge, which is the whole point.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What's the best starting position?</div>
+      <div class="faq-a">There's no "best" position — it's a strategic choice. Starting high gives shorter odds on Make It (less to win) but a shorter game. Starting low gives longer odds (bigger wins if they make it) but more throws and more chances to hit a double. Shrewd bettors will adjust their Make It / Don't Make It bets based on the start position.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I bet against the shooter if I'm the shooter?</div>
+      <div class="faq-a">Technically possible, but where's the fun in that? House rules apply — in most casual games, the shooter is expected to bet on themselves making it. But for a friendly game, you make the rules.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Do I need real money to play?</div>
+      <div class="faq-a">Not at all. The digital version uses fictional chips. For a physical game at home, you can use poker chips, pennies, matchsticks, or whatever you like. The game works just as well as a social betting game without real money involved.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  LASCALA · © 2018 MATCHLESS GAMES LIMITED · ALL RIGHTS RESERVED<br>
+  <span style="opacity:0.5; font-size:10px">FOR ENTERTAINMENT USE ONLY</span>
+</footer>
+
+</body>
+</html>

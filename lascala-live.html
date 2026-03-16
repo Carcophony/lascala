@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaScala LIVE — The Crowd Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08080f;
+  --bg2: #0f0f1a;
+  --bg3: #161625;
+  --bg4: #1c1c30;
+  --gold: #c9a84c;
+  --gold2: #f0c840;
+  --gold-dim: #5a4818;
+  --red: #e63946;
+  --green: #2dc653;
+  --blue: #4361ee;
+  --purple: #7209b7;
+  --cyan: #4cc9f0;
+  --border: #252538;
+  --text: #e8e2d4;
+  --text-mid: #7a7090;
+  --text-dim: #3a3450;
+  --card-w: 160px;
+  --card-h: 224px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NOISE */
+body::after {
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9000;opacity:.35;
+}
+
+/* ── HEADER ── */
+.site-header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 30px;
+  border-bottom:1px solid var(--border);
+  background:rgba(8,8,15,0.95);
+  backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:100;
+}
+
+.logo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:32px;letter-spacing:.15em;
+  background:linear-gradient(135deg,#6a5020,#c9a84c,#f0c840,#c9a84c,#6a5020);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.live-badge {
+  display:flex;align-items:center;gap:6px;
+  background:#1a0808;border:1px solid var(--red);
+  border-radius:20px;padding:4px 12px;
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--red);
+  letter-spacing:.15em;
+}
+
+.live-dot {
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red);
+  animation:live-pulse 1.2s ease-in-out infinite;
+}
+@keyframes live-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.header-right{display:flex;align-items:center;gap:16px;}
+
+.viewer-count {
+  font-family:'DM Mono',monospace;font-size:12px;color:var(--text-mid);
+  letter-spacing:.1em;
+}
+
+/* ── LAYOUT ── */
+.main-grid {
+  display:grid;
+  grid-template-columns:320px 1fr 300px;
+  gap:0;
+  min-height:calc(100vh - 57px);
+}
+@media(max-width:1000px){.main-grid{grid-template-columns:1fr}.side-left,.side-right{display:none}}
+
+/* ── PANELS ── */
+.side-left,.side-right{
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;max-height:calc(100vh - 57px);
+}
+.side-right{border-right:none;border-left:1px solid var(--border);}
+
+.panel-section{
+  padding:18px;
+  border-bottom:1px solid var(--border);
+}
+
+.panel-title{
+  font-family:'Bebas Neue',sans-serif;font-size:14px;
+  letter-spacing:.25em;color:var(--text-mid);
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* ── CENTRE STAGE ── */
+.centre{
+  display:flex;flex-direction:column;align-items:center;
+  padding:30px 20px;gap:24px;
+  overflow-y:auto;max-height:calc(100vh - 57px);
+}
+
+/* ── LADDER ── */
+.ladder-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  width:100%;max-width:500px;
+}
+
+.ladder-header{
+  font-family:'Bebas Neue',sans-serif;font-size:13px;
+  letter-spacing:.3em;color:var(--text-mid);
+}
+
+.ladder{
+  display:flex;flex-direction:column-reverse;
+  gap:3px;width:260px;
+}
+
+.rung{
+  display:flex;align-items:center;gap:10px;
+  height:42px;border-radius:6px;padding:0 12px;
+  background:var(--bg2);border:1px solid var(--border);
+  transition:all .3s ease;position:relative;
+}
+.rung.top{background:linear-gradient(90deg,#0d1f10,#0a1a0d);border-color:var(--green);box-shadow:0 0 14px rgba(45,198,83,.15);}
+.rung.bottom{opacity:.4;}
+.rung.here{
+  background:linear-gradient(90deg,#1a1508,#261d08);
+  border-color:var(--gold);
+  box-shadow:0 0 20px rgba(201,168,76,.35);
+  animation:rung-glow 1.8s ease-in-out infinite;
+}
+@keyframes rung-glow{0%,100%{box-shadow:0 0 20px rgba(201,168,76,.35)}50%{box-shadow:0 0 35px rgba(201,168,76,.65)}}
+
+.rung-num{
+  font-family:'Bebas Neue',sans-serif;font-size:20px;
+  color:var(--text-dim);width:26px;text-align:right;flex-shrink:0;
+}
+.rung.top .rung-num{color:var(--green);}
+.rung.here .rung-num{color:var(--gold2);}
+
+.rung-bar{flex:1;height:2px;background:var(--border);border-radius:2px;}
+.rung.top .rung-bar{background:var(--green);}
+.rung.here .rung-bar{background:var(--gold);}
+
+.rung-tok{
+  width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--gold);
+  background:radial-gradient(circle at 35% 35%,#f0c840,#8a6a20);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;flex-shrink:0;
+  transition:all .4s cubic-bezier(.34,1.56,.64,1);
+}
+.rung-tok.hidden{opacity:0;transform:scale(0);}
+
+/* crowd bet bar on each rung */
+.rung-crowd{
+  position:absolute;right:44px;top:0;bottom:0;
+  display:flex;align-items:center;gap:3px;
+  pointer-events:none;
+}
+.crowd-make,.crowd-dont{
+  height:6px;border-radius:3px;min-width:2px;
+  transition:width .4s ease;
+}
+.crowd-make{background:var(--green);}
+.crowd-dont{background:var(--red);}
+
+/* ── DICE ── */
+.dice-zone{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:20px 30px;width:100%;max-width:500px;
+}
+
+.dice-row{display:flex;align-items:center;gap:18px;}
+
+.die{
+  width:70px;height:70px;
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:12px;display:grid;place-items:center;
+  font-size:36px;transition:all .3s;
+}
+.die.rolling{
+  animation:die-roll .55s ease-in-out;
+  border-color:var(--gold);
+  box-shadow:0 0 20px rgba(201,168,76,.3);
+}
+@keyframes die-roll{
+  0%{transform:rotate(0)scale(1)}
+  25%{transform:rotate(-20deg)scale(.85)}
+  60%{transform:rotate(12deg)scale(1.15)}
+  85%{transform:rotate(-6deg)scale(.95)}
+  100%{transform:rotate(0)scale(1)}
+}
+
+.die-sep{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text-dim);}
+
+.diff-big{
+  font-family:'Bebas Neue',sans-serif;font-size:64px;
+  color:var(--gold2);line-height:1;
+  filter:drop-shadow(0 0 16px rgba(240,200,64,.4));
+}
+
+.dice-label{
+  font-family:'DM Mono',monospace;font-size:11px;
+  letter-spacing:.25em;color:var(--text-mid);text-transform:uppercase;
+}
+
+/* ── THROW BTN ── */
+.throw-btn{
+  width:100%;max-width:500px;
+  padding:16px;border:none;border-radius:8px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;
+  letter-spacing:.2em;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));
+  color:var(--bg);
+  box-shadow:0 4px 24px rgba(201,168,76,.3);
+  transition:all .2s;
+}
+.throw-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 36px rgba(201,168,76,.5);}
+.throw-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+/* ── CROWD BETTING ── */
+.crowd-bet-panel{
+  width:100%;max-width:500px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+
+.crowd-bet-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+}
+
+.crowd-bet-title{
+  font-family:'Bebas Neue',sans-serif;font-size:16px;
+  letter-spacing:.2em;color:var(--text);
+}
+
+.bet-timer{
+  font-family:'DM Mono',monospace;font-size:13px;
+  color:var(--gold);letter-spacing:.1em;
+}
+
+.crowd-bet-btns{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;
+}
+
+.crowd-btn{
+  padding:20px;border:none;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:20px;
+  letter-spacing:.12em;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.crowd-btn.make-btn{background:#0d1f10;color:var(--green);border-right:1px solid var(--border);}
+.crowd-btn.dont-btn{background:#1a0808;color:var(--red);}
+.crowd-btn:hover:not(:disabled){filter:brightness(1.3);}
+.crowd-btn:disabled{opacity:.35;cursor:not-allowed;}
+.crowd-btn.voted{filter:brightness(1.4);transform:scale(.97);}
+
+.crowd-btn .btn-odds{
+  font-size:13px;color:var(--text-mid);
+  font-family:'DM Mono',monospace;
+}
+
+.crowd-bar-wrap{
+  padding:14px 18px;display:flex;gap:0;
+  border-top:1px solid var(--border);
+  align-items:center;gap:10px;
+}
+
+.crowd-bar-track{
+  flex:1;height:10px;border-radius:5px;
+  background:var(--bg3);overflow:hidden;
+  display:flex;
+}
+
+.crowd-bar-make{height:100%;background:var(--green);border-radius:5px 0 0 5px;transition:width .5s ease;}
+.crowd-bar-dont{height:100%;background:var(--red);border-radius:0 5px 5px 0;transition:width .5s ease;}
+
+.crowd-pct{
+  font-family:'DM Mono',monospace;font-size:12px;
+  min-width:38px;text-align:right;
+}
+.crowd-pct.make{color:var(--green);}
+.crowd-pct.dont{color:var(--red);}
+
+.crowd-count{
+  font-size:11px;color:var(--text-mid);
+  font-family:'DM Mono',monospace;
+  text-align:center;padding:8px;
+  border-top:1px solid var(--border);
+}
+
+/* ── CHIPS ── */
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0;}
+.chip{
+  width:42px;height:42px;border-radius:50%;
+  border:3px solid transparent;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.chip-1{background:#1e1e2a;color:#888;border-color:#333;}
+.chip-5{background:#0d2010;color:var(--green);border-color:#1a4020;}
+.chip-10{background:#200d0d;color:#e74c3c;border-color:#4a1a1a;}
+.chip-25{background:#0d1520;color:#4cc9f0;border-color:#1a3050;}
+.chip-100{background:#1a1408;color:var(--gold2);border-color:var(--gold-dim);}
+.chip.sel{transform:scale(1.18) translateY(-3px);}
+.chip-1.sel{border-color:#888;box-shadow:0 4px 12px rgba(136,136,136,.4);}
+.chip-5.sel{border-color:var(--green);box-shadow:0 4px 12px rgba(45,198,83,.4);}
+.chip-10.sel{border-color:#e74c3c;box-shadow:0 4px 12px rgba(231,76,60,.4);}
+.chip-25.sel{border-color:#4cc9f0;box-shadow:0 4px 12px rgba(76,201,240,.4);}
+.chip-100.sel{border-color:var(--gold2);box-shadow:0 4px 12px rgba(240,200,64,.4);}
+
+/* ── MY BALANCE ── */
+.balance-display{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;margin-bottom:12px;
+}
+.bal-label{font-size:11px;color:var(--text-mid);font-family:'DM Mono',monospace;letter-spacing:.1em;}
+.bal-amount{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold2);}
+
+/* ── LEADERBOARD ── */
+.leaderboard{display:flex;flex-direction:column;gap:4px;}
+.lb-row{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border-radius:6px;
+  background:var(--bg3);border:1px solid var(--border);
+  font-size:13px;
+}
+.lb-row.me{border-color:var(--gold-dim);background:#1a1608;}
+.lb-rank{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  color:var(--text-dim);width:20px;text-align:center;
+}
+.lb-rank.gold{color:var(--gold2);}
+.lb-rank.silver{color:#aaa;}
+.lb-rank.bronze{color:#cd7f32;}
+.lb-name{flex:1;font-weight:600;font-size:13px;}
+.lb-chips{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);}
+
+/* ── PRIZE CARDS ── */
+.cards-row{
+  display:flex;gap:12px;flex-wrap:wrap;
+  justify-content:center;padding:4px 0;
+}
+
+.prize-card{
+  width:var(--card-w);height:var(--card-h);
+  border-radius:12px;
+  cursor:pointer;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+
+.prize-card:hover{transform:translateY(-8px) scale(1.04);}
+
+.prize-card.locked{
+  filter:grayscale(.8) brightness(.4);
+  cursor:default;
+}
+.prize-card.locked:hover{transform:none;}
+
+.card-face{
+  width:100%;height:100%;border-radius:12px;
+  display:flex;flex-direction:column;
+  border:2px solid transparent;
+  position:relative;overflow:hidden;
+}
+
+/* Rarity tiers */
+.card-face.common{
+  background:linear-gradient(160deg,#1a1a2e,#16213e);
+  border-color:#3a3a5a;
+}
+.card-face.rare{
+  background:linear-gradient(160deg,#0d1b2a,#1b4965);
+  border-color:#4cc9f0;
+  box-shadow:0 0 14px rgba(76,201,240,.2);
+}
+.card-face.epic{
+  background:linear-gradient(160deg,#1a0d2e,#2d1b69);
+  border-color:#7209b7;
+  box-shadow:0 0 18px rgba(114,9,183,.35);
+}
+.card-face.legendary{
+  background:linear-gradient(160deg,#1a1205,#2e2008);
+  border-color:var(--gold);
+  box-shadow:0 0 24px rgba(201,168,76,.45);
+  animation:legendary-shine 3s ease-in-out infinite;
+}
+@keyframes legendary-shine{
+  0%,100%{box-shadow:0 0 24px rgba(201,168,76,.45)}
+  50%{box-shadow:0 0 40px rgba(201,168,76,.8)}
+}
+
+.card-tier{
+  font-family:'Bebas Neue',sans-serif;font-size:10px;
+  letter-spacing:.25em;padding:6px 10px 0;
+  text-align:center;
+}
+.common .card-tier{color:#5a5a8a;}
+.rare .card-tier{color:var(--cyan);}
+.epic .card-tier{color:#b44bff;}
+.legendary .card-tier{color:var(--gold2);}
+
+.card-icon{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:52px;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));
+}
+
+.card-name{
+  font-family:'Bebas Neue',sans-serif;font-size:14px;
+  letter-spacing:.12em;text-align:center;
+  padding:0 8px 4px;color:var(--text);
+}
+
+.card-stat{
+  display:flex;justify-content:space-between;
+  padding:4px 10px;border-top:1px solid rgba(255,255,255,.08);
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:var(--text-mid);
+}
+
+.card-power{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  text-align:center;padding:4px 0 8px;
+}
+.common .card-power{color:#7a7aaa;}
+.rare .card-power{color:var(--cyan);}
+.epic .card-power{color:#b44bff;}
+.legendary .card-power{color:var(--gold2);}
+
+.card-lock-icon{
+  position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:36px;
+  background:rgba(0,0,0,.6);border-radius:12px;
+}
+
+/* ── GAME LOG ── */
+.log-scroll{
+  max-height:200px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+.log-entry{
+  font-size:11px;color:var(--text-mid);
+  padding:3px 0;border-bottom:1px solid #14141e;
+  line-height:1.6;font-family:'DM Mono',monospace;
+}
+.log-entry.ev{color:var(--gold);}
+.log-entry.win{color:var(--green);}
+.log-entry.lose{color:var(--red);}
+
+/* ── OUTCOME OVERLAY ── */
+#outcome-overlay{
+  position:fixed;inset:0;display:none;
+  align-items:center;justify-content:center;
+  z-index:600;background:rgba(5,5,12,.92);
+  backdrop-filter:blur(6px);
+}
+#outcome-overlay.show{display:flex;}
+
+.outcome-box{
+  text-align:center;padding:50px 40px;
+  border-radius:16px;border:2px solid var(--gold);
+  background:var(--bg2);max-width:460px;width:90%;
+  animation:pop-in .4s cubic-bezier(.34,1.56,.64,1);
+}
+.outcome-box.lose{border-color:var(--red);}
+@keyframes pop-in{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+
+.outcome-icon{font-size:72px;margin-bottom:16px;}
+.outcome-title{
+  font-family:'Bebas Neue',sans-serif;font-size:56px;
+  letter-spacing:.15em;margin-bottom:8px;
+}
+.outcome-box.win-box .outcome-title{color:var(--green);}
+.outcome-box.lose .outcome-title{color:var(--red);}
+.outcome-sub{font-size:14px;color:var(--text-mid);margin-bottom:8px;line-height:1.7;}
+.outcome-winnings{
+  font-family:'Bebas Neue',sans-serif;font-size:32px;
+  color:var(--gold2);margin:16px 0;
+}
+
+/* ── CARD EARNED TOAST ── */
+.card-toast{
+  position:fixed;bottom:30px;right:30px;
+  background:var(--bg2);border:1px solid var(--gold);
+  border-radius:12px;padding:16px 20px;
+  display:flex;align-items:center;gap:14px;
+  z-index:700;
+  animation:slide-in .4s cubic-bezier(.34,1.56,.64,1);
+  max-width:300px;
+}
+@keyframes slide-in{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-icon{font-size:36px;}
+.toast-text{font-size:13px;line-height:1.6;}
+.toast-title{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold2);letter-spacing:.1em;}
+
+/* ── SETUP SCREEN ── */
+#setup-screen{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(5,5,12,.98);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+
+.setup-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:40px;max-width:480px;width:100%;
+  position:relative;
+}
+.setup-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  border-radius:16px 16px 0 0;
+}
+
+.setup-title{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:.2em;color:var(--gold);text-align:center;margin-bottom:4px;}
+.setup-sub{font-size:12px;color:var(--text-mid);text-align:center;letter-spacing:.2em;margin-bottom:30px;}
+.setup-label{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.2em;color:var(--text-mid);margin-bottom:8px;}
+.setup-group{margin-bottom:20px;}
+
+.setup-name-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:12px 14px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:15px;outline:none;
+}
+.setup-name-input:focus{border-color:var(--gold-dim);}
+
+.role-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.role-btn{
+  padding:16px;border:1px solid var(--border);
+  border-radius:10px;background:var(--bg3);
+  color:var(--text);cursor:pointer;transition:all .2s;
+  text-align:center;
+}
+.role-btn.selected{border-color:var(--gold);background:#1a1608;color:var(--gold2);}
+.role-btn:hover{border-color:var(--gold-dim);}
+.role-btn .role-icon{font-size:28px;margin-bottom:6px;display:block;}
+.role-btn .role-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.1em;}
+.role-btn .role-desc{font-size:11px;color:var(--text-mid);margin-top:4px;}
+
+.btn-go{
+  width:100%;padding:14px;border:none;border-radius:8px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.2em;
+  cursor:pointer;margin-top:10px;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));
+  color:var(--bg);box-shadow:0 4px 24px rgba(201,168,76,.3);
+  transition:all .2s;
+}
+.btn-go:hover{transform:translateY(-2px);box-shadow:0 8px 36px rgba(201,168,76,.5);}
+
+/* ── MISC ── */
+.divider{border:none;border-top:1px solid var(--border);margin:10px 0;}
+
+.tag{
+  display:inline-block;padding:2px 8px;border-radius:3px;
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;
+}
+.tag-gold{background:#1a1408;color:var(--gold);}
+.tag-green{background:#0d2010;color:var(--green);}
+.tag-red{background:#200808;color:var(--red);}
+
+.btn-sm{
+  padding:7px 14px;border:1px solid var(--border);
+  border-radius:6px;background:transparent;
+  color:var(--text-mid);font-family:'DM Mono',monospace;
+  font-size:11px;cursor:pointer;transition:all .2s;
+}
+.btn-sm:hover{border-color:var(--gold-dim);color:var(--gold);}
+
+.section-note{
+  font-size:11px;color:var(--text-mid);
+  font-family:'DM Mono',monospace;
+  text-align:center;padding:6px;
+  letter-spacing:.1em;
+}
+
+/* confetti */
+.confetti-piece{
+  position:fixed;width:8px;height:8px;
+  pointer-events:none;z-index:800;
+  animation:cffall linear forwards;
+}
+@keyframes cffall{
+  0%{transform:translateY(-20px) rotate(0);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+
+.stats-row{
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  margin:8px 0;
+}
+.stat-pill{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px;
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:var(--text-mid);
+}
+.stat-pill span{color:var(--gold);font-size:13px;}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-box">
+    <div class="setup-title">LaScala</div>
+    <div class="setup-sub">LIVE · THE CROWD GAME</div>
+
+    <div class="setup-group">
+      <div class="setup-label">Your Name</div>
+      <input class="setup-name-input" id="player-name" placeholder="Enter your name..." value="Player" maxlength="20">
+    </div>
+
+    <div class="setup-group">
+      <div class="setup-label">Your Role</div>
+      <div class="role-btns">
+        <div class="role-btn selected" id="role-crowd" onclick="selectRole('crowd')">
+          <span class="role-icon">👥</span>
+          <div class="role-name">Crowd</div>
+          <div class="role-desc">Watch & bet on each throw</div>
+        </div>
+        <div class="role-btn" id="role-shooter" onclick="selectRole('shooter')">
+          <span class="role-icon">🎲</span>
+          <div class="role-name">Shooter</div>
+          <div class="role-desc">Take the dice & climb</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-group">
+      <div class="setup-label">Ladder Height</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-sm" onclick="setLadder(7,this)">7 — Quick</button>
+        <button class="btn-sm" id="ladder-sel" onclick="setLadder(10,this)" style="border-color:var(--gold);color:var(--gold)">10 — Classic</button>
+        <button class="btn-sm" onclick="setLadder(15,this)">15 — Long</button>
+      </div>
+    </div>
+
+    <button class="btn-go" onclick="startGame()">▶ JOIN THE GAME</button>
+  </div>
+</div>
+
+<!-- OUTCOME -->
+<div id="outcome-overlay">
+  <div class="outcome-box" id="outcome-box">
+    <div class="outcome-icon" id="o-icon">🏆</div>
+    <div class="outcome-title" id="o-title">MADE IT!</div>
+    <div class="outcome-sub" id="o-sub"></div>
+    <div class="outcome-winnings" id="o-winnings"></div>
+    <div id="o-card-earned" style="margin:12px 0"></div>
+    <button class="btn-go" onclick="nextRound()" style="margin-top:8px">NEXT ROUND</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div class="logo">LaScala LIVE</div>
+  <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+  <div class="header-right">
+    <div class="viewer-count">👥 <span id="viewer-num">1</span> watching</div>
+    <button class="btn-sm" onclick="resetGame()">↺ New Game</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-grid">
+
+  <!-- LEFT: My Game -->
+  <div class="side-left">
+
+    <div class="panel-section">
+      <div class="panel-title">👤 My Game</div>
+      <div class="balance-display">
+        <div>
+          <div class="bal-label">VIRTUAL CHIPS</div>
+          <div class="bal-amount" id="my-balance">1,000</div>
+        </div>
+        <div style="text-align:right">
+          <div class="bal-label">ROUND</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text-mid)" id="round-num">1</div>
+        </div>
+      </div>
+      <div id="my-role-tag" style="text-align:center;margin-bottom:8px"></div>
+      <div class="stats-row">
+        <div class="stat-pill">Wins: <span id="stat-wins">0</span></div>
+        <div class="stat-pill">Streak: <span id="stat-streak">0</span></div>
+        <div class="stat-pill">Cards: <span id="stat-cards">0</span></div>
+      </div>
+    </div>
+
+    <div class="panel-section" id="shooter-controls" style="display:none">
+      <div class="panel-title">🎲 Shooter Controls</div>
+      <div style="font-size:12px;color:var(--text-mid);margin-bottom:10px;font-family:'DM Mono',monospace">
+        You are the shooter. Choose your start position.
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="start-pos-btns"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">💰 My Bet</div>
+      <div class="chip-row" id="chip-row-left">
+        <div class="chip chip-1" data-val="1">£1</div>
+        <div class="chip chip-5" data-val="5">£5</div>
+        <div class="chip chip-10 sel" data-val="10">£10</div>
+        <div class="chip chip-25" data-val="25">£25</div>
+        <div class="chip chip-100" data-val="100">£100</div>
+      </div>
+      <div id="my-bets-list" style="font-size:11px;color:var(--text-mid);font-family:'DM Mono',monospace;min-height:30px;margin-top:8px">No bets yet.</div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">📊 Game Log</div>
+      <div class="log-scroll" id="game-log">
+        <div class="log-entry ev">LaScala LIVE — Welcome to the crowd game.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CENTRE: The Game -->
+  <div class="centre">
+
+    <div class="ladder-wrap">
+      <div class="ladder-header">— THE LADDER —</div>
+      <div class="ladder" id="ladder"></div>
+    </div>
+
+    <div class="dice-zone">
+      <div class="dice-row">
+        <div class="die" id="die1">?</div>
+        <div class="die-sep">−</div>
+        <div class="die" id="die2">?</div>
+        <div class="die-sep">=</div>
+        <div>
+          <div class="diff-big" id="diff-show">—</div>
+          <div class="dice-label" style="text-align:center">DIFF</div>
+        </div>
+      </div>
+      <div class="dice-label" id="dice-status-text">Waiting for bets...</div>
+    </div>
+
+    <!-- Crowd Betting -->
+    <div class="crowd-bet-panel">
+      <div class="crowd-bet-header">
+        <div class="crowd-bet-title">🎰 CROWD BET</div>
+        <div class="bet-timer" id="bet-timer"></div>
+      </div>
+      <div class="crowd-bet-btns">
+        <button class="crowd-btn make-btn" id="bet-make-btn" onclick="placeCrowdBet('make')">
+          <span>MAKE IT</span>
+          <span class="btn-odds" id="make-odds">—/10</span>
+        </button>
+        <button class="crowd-btn dont-btn" id="bet-dont-btn" onclick="placeCrowdBet('dont')">
+          <span>DON'T MAKE IT</span>
+          <span class="btn-odds" id="dont-odds">—/10</span>
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)">
+        <button class="crowd-btn" style="background:#0a0a16;color:var(--cyan);font-size:15px;border-right:1px solid var(--border)" id="bet-diff-low" onclick="placeCrowdBet('diff_low')">
+          <span>LOW (1–2)</span>
+          <span class="btn-odds" style="color:var(--text-mid)">1.8/10</span>
+        </button>
+        <button class="crowd-btn" style="background:#0a0a16;color:var(--purple);font-size:15px" id="bet-diff-high" onclick="placeCrowdBet('diff_high')">
+          <span>HIGH (3–5)</span>
+          <span class="btn-odds" style="color:var(--text-mid)">2.4/10</span>
+        </button>
+      </div>
+      <div class="crowd-bar-wrap">
+        <span class="crowd-pct make" id="make-pct">50%</span>
+        <div class="crowd-bar-track">
+          <div class="crowd-bar-make" id="crowd-bar-make" style="width:50%"></div>
+          <div class="crowd-bar-dont" id="crowd-bar-dont" style="width:50%"></div>
+        </div>
+        <span class="crowd-pct dont" id="dont-pct">50%</span>
+      </div>
+      <div class="crowd-count" id="crowd-count">0 bets placed this round</div>
+    </div>
+
+    <button class="throw-btn" id="throw-btn" onclick="throwDice()">🎲 THROW DICE</button>
+
+  </div>
+
+  <!-- RIGHT: Leaderboard + Cards -->
+  <div class="side-right">
+
+    <div class="panel-section">
+      <div class="panel-title">🏆 Leaderboard</div>
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">🃏 Prize Cards — My Collection</div>
+      <div class="section-note">Earn cards by winning. Higher streaks = rarer cards.</div>
+      <div class="cards-row" id="my-cards"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">🎴 Card Rarity Guide</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-family:'DM Mono',monospace">
+        <div style="color:#7a7aaa">⬜ COMMON — Win any round</div>
+        <div style="color:var(--cyan)">🟦 RARE — Win 3 in a row</div>
+        <div style="color:#b44bff">🟪 EPIC — Win 5 in a row</div>
+        <div style="color:var(--gold2)">🟨 LEGENDARY — Win 7 in a row</div>
+      </div>
+      <div class="section-note" style="margin-top:10px">Cards persist in your browser.<br>Trade codes coming soon.</div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  LASCALA LIVE ENGINE
+// ═══════════════════════════════════════════════════════
+
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+const DIFF_PROBS = [6/36, 10/36, 8/36, 6/36, 4/36, 2/36];
+
+// PRIZE CARDS DATA
+const CARD_DEFS = [
+  // Common
+  { id:'c1', tier:'common', icon:'🎲', name:'First Throw', power:12, stat:'Luck', statVal:'+5%' },
+  { id:'c2', tier:'common', icon:'🪜', name:'The Ladder', power:18, stat:'Climb', statVal:'+1 Rung' },
+  { id:'c3', tier:'common', icon:'🎯', name:'Dead Eye', power:22, stat:'Aim', statVal:'+8%' },
+  { id:'c4', tier:'common', icon:'🎰', name:'One Shot', power:15, stat:'Daring', statVal:'+3%' },
+  // Rare
+  { id:'r1', tier:'rare', icon:'⚡', name:'Hot Streak', power:45, stat:'Speed', statVal:'+15%' },
+  { id:'r2', tier:'rare', icon:'🌊', name:'The Wave', power:52, stat:'Flow', statVal:'+12%' },
+  { id:'r3', tier:'rare', icon:'🔥', name:'On Fire', power:58, stat:'Heat', statVal:'+20%' },
+  // Epic
+  { id:'e1', tier:'epic', icon:'💎', name:'Diamond Run', power:120, stat:'Purity', statVal:'+35%' },
+  { id:'e2', tier:'epic', icon:'🌙', name:'Dark Horse', power:135, stat:'Shadow', statVal:'+28%' },
+  // Legendary
+  { id:'l1', tier:'legendary', icon:'👑', name:'The Crown', power:500, stat:'Reign', statVal:'∞' },
+  { id:'l2', tier:'legendary', icon:'🏆', name:'LaScala Legend', power:777, stat:'Legacy', statVal:'MAX' },
+];
+
+let G = {
+  role: 'crowd',
+  playerName: 'Player',
+  ladderSize: 10,
+  startPos: 5,
+  pos: 0,
+  phase: 'betting', // betting | throwing | gameover
+  round: 1,
+  myBalance: 1000,
+  myBets: {},
+  myChip: 10,
+  myVoted: null,
+  wins: 0,
+  streak: 0,
+  myCards: [],
+  // Simulated crowd
+  crowdMake: 52,
+  crowdDont: 48,
+  crowdBetCount: 0,
+  // Fake leaderboard
+  leaderboard: [],
+  throwCount: 0,
+  viewerCount: 1,
+  log: [],
+};
+
+const FAKE_NAMES = ['Marco','Izzy','Ravi','Cleo','Jax','Bex','Tomo','Suki','Ned','Priya','Wolf','Luna'];
+const FAKE_BALANCES = [2840,2210,1980,1750,1640,1520,1410,1380];
+
+function initLeaderboard() {
+  G.leaderboard = FAKE_NAMES.slice(0,7).map((n,i) => ({
+    name: n, chips: FAKE_BALANCES[i] || 1200 + Math.floor(Math.random()*600), isMe: false
+  }));
+  G.leaderboard.splice(Math.floor(Math.random()*4)+1, 0, { name: G.playerName, chips: G.myBalance, isMe: true });
+  G.viewerCount = 8 + Math.floor(Math.random()*24);
+}
+
+// ── SETUP ──────────────────────────────────────────────
+
+let selectedRole = 'crowd';
+let selectedLadder = 10;
+
+function selectRole(r) {
+  selectedRole = r;
+  document.getElementById('role-crowd').classList.toggle('selected', r==='crowd');
+  document.getElementById('role-shooter').classList.toggle('selected', r==='shooter');
+}
+
+function setLadder(n, btn) {
+  selectedLadder = n;
+  document.querySelectorAll('.btn-sm').forEach(b => { b.style.borderColor=''; b.style.color=''; });
+  if(btn) { btn.style.borderColor='var(--gold)'; btn.style.color='var(--gold)'; }
+}
+
+function startGame() {
+  const name = document.getElementById('player-name').value.trim() || 'Player';
+  G.playerName = name;
+  G.role = selectedRole;
+  G.ladderSize = selectedLadder;
+  G.pos = Math.floor(selectedLadder / 2);
+  G.startPos = G.pos;
+
+  loadCards();
+  initLeaderboard();
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('viewer-num').textContent = G.viewerCount;
+
+  if (G.role === 'shooter') {
+    document.getElementById('shooter-controls').style.display = 'block';
+    renderStartPosBtns();
+    document.getElementById('throw-btn').style.display = 'block';
+    document.getElementById('my-role-tag').innerHTML = '<span class="tag tag-gold">🎲 YOU ARE THE SHOOTER</span>';
+  } else {
+    document.getElementById('throw-btn').style.display = 'none';
+    document.getElementById('my-role-tag').innerHTML = '<span class="tag" style="background:#0d1520;color:var(--cyan)">👥 YOU ARE IN THE CROWD</span>';
+    // Auto-throw for crowd
+    scheduleAutoThrow();
+  }
+
+  addLog('Game started! Ladder: '+G.ladderSize+' · Position: '+G.pos, 'ev');
+  addLog(name + ' joins as ' + G.role, 'ev');
+  renderAll();
+  simulateCrowdBets();
+}
+
+function renderStartPosBtns() {
+  const c = document.getElementById('start-pos-btns');
+  c.innerHTML = '';
+  for (let i=1; i<G.ladderSize; i++) {
+    const b = document.createElement('button');
+    b.className = 'btn-sm';
+    b.textContent = i;
+    if (i === G.pos) { b.style.borderColor='var(--gold)'; b.style.color='var(--gold)'; }
+    b.onclick = () => {
+      G.pos = i; G.startPos = i;
+      document.querySelectorAll('#start-pos-btns .btn-sm').forEach(x=>{x.style.borderColor='';x.style.color='';});
+      b.style.borderColor='var(--gold)'; b.style.color='var(--gold)';
+      renderLadder(); updateOdds();
+    };
+    c.appendChild(b);
+  }
+}
+
+// ── RENDER ─────────────────────────────────────────────
+
+function renderAll() {
+  renderLadder();
+  updateOdds();
+  renderLeaderboard();
+  renderMyCards();
+  renderMyBets();
+  updateStats();
+}
+
+function renderLadder() {
+  const c = document.getElementById('ladder');
+  c.innerHTML = '';
+  for (let i=0; i<=G.ladderSize; i++) {
+    const rung = document.createElement('div');
+    rung.className = 'rung';
+    if (i===G.ladderSize) rung.classList.add('top');
+    if (i===0) rung.classList.add('bottom');
+    if (i===G.pos) rung.classList.add('here');
+
+    const num = document.createElement('div');
+    num.className = 'rung-num'; num.textContent = i;
+
+    const bar = document.createElement('div');
+    bar.className = 'rung-bar';
+
+    // Crowd bet indicator
+    const crowd = document.createElement('div');
+    crowd.className = 'rung-crowd';
+    if (i === G.pos) {
+      const m = document.createElement('div');
+      m.className = 'crowd-make';
+      m.style.width = Math.max(2, G.crowdMake * 0.5) + 'px';
+      const d = document.createElement('div');
+      d.className = 'crowd-dont';
+      d.style.width = Math.max(2, G.crowdDont * 0.5) + 'px';
+      crowd.appendChild(m); crowd.appendChild(d);
+    }
+
+    const tok = document.createElement('div');
+    tok.className = 'rung-tok' + (i===G.pos ? '' : ' hidden');
+    tok.textContent = '🎲';
+
+    rung.appendChild(num); rung.appendChild(bar); rung.appendChild(crowd); rung.appendChild(tok);
+    c.appendChild(rung);
+  }
+}
+
+function updateOdds() {
+  const makeP = calcMakeProb(G.pos, G.ladderSize);
+  const dontP = 1 - makeP;
+  const makeO = probToOdds(makeP);
+  const dontO = probToOdds(dontP);
+  document.getElementById('make-odds').textContent = makeO + '/10';
+  document.getElementById('dont-odds').textContent = dontO + '/10';
+  document.getElementById('make-pct').textContent = Math.round(G.crowdMake) + '%';
+  document.getElementById('dont-pct').textContent = Math.round(G.crowdDont) + '%';
+  document.getElementById('crowd-bar-make').style.width = G.crowdMake + '%';
+  document.getElementById('crowd-bar-dont').style.width = G.crowdDont + '%';
+}
+
+function renderLeaderboard() {
+  // Update my entry
+  G.leaderboard = G.leaderboard.map(p => p.isMe ? {...p, chips: G.myBalance, name: G.playerName} : p);
+  G.leaderboard.sort((a,b) => b.chips - a.chips);
+
+  const c = document.getElementById('leaderboard');
+  c.innerHTML = '';
+  G.leaderboard.slice(0,8).forEach((p,i) => {
+    const row = document.createElement('div');
+    row.className = 'lb-row' + (p.isMe ? ' me' : '');
+    const rankClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    row.innerHTML = `<div class="lb-rank ${rankClass}">${medal||i+1}</div><div class="lb-name">${p.name}${p.isMe?' (you)':''}</div><div class="lb-chips">${p.chips.toLocaleString()}</div>`;
+    c.appendChild(row);
+  });
+}
+
+function renderMyCards() {
+  const c = document.getElementById('my-cards');
+  c.innerHTML = '';
+  // Show earned cards + locked slots
+  const allCards = CARD_DEFS.slice(0,6); // show first 6 as preview
+  allCards.forEach(card => {
+    const earned = G.myCards.find(mc => mc.id === card.id);
+    const el = document.createElement('div');
+    el.className = 'prize-card' + (earned ? '' : ' locked');
+    el.title = earned ? card.name : 'Locked — keep playing to earn';
+    el.innerHTML = buildCardHTML(card, !earned);
+    el.onclick = () => { if(earned) showCardDetail(card); };
+    c.appendChild(el);
+  });
+  document.getElementById('stat-cards').textContent = G.myCards.length;
+}
+
+function buildCardHTML(card, locked) {
+  return `<div class="card-face ${card.tier}">
+    <div class="card-tier">${card.tier.toUpperCase()}</div>
+    <div class="card-icon">${card.icon}</div>
+    <div class="card-name">${card.name}</div>
+    <div class="card-stat"><span>${card.stat}</span><span>${card.statVal}</span></div>
+    <div class="card-power">${card.power}</div>
+    ${locked ? '<div class="card-lock-icon">🔒</div>' : ''}
+  </div>`;
+}
+
+function updateStats() {
+  document.getElementById('my-balance').textContent = G.myBalance.toLocaleString();
+  document.getElementById('stat-wins').textContent = G.wins;
+  document.getElementById('stat-streak').textContent = G.streak;
+  document.getElementById('round-num').textContent = G.round;
+}
+
+function renderMyBets() {
+  const c = document.getElementById('my-bets-list');
+  const keys = Object.keys(G.myBets);
+  if (!keys.length) { c.textContent = 'No bets yet.'; return; }
+  c.innerHTML = '';
+  keys.forEach(k => {
+    const b = G.myBets[k];
+    const d = document.createElement('div');
+    d.style.cssText = 'display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #14141e;';
+    d.innerHTML = `<span>${b.name}</span><span style="color:var(--gold)">${b.total} @ ${b.odds}/10</span>`;
+    c.appendChild(d);
+  });
+}
+
+// ── BETTING ────────────────────────────────────────────
+
+document.getElementById('chip-row-left').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  G.myChip = parseInt(chip.dataset.val);
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('sel'));
+  chip.classList.add('sel');
+});
+
+function placeCrowdBet(type) {
+  if (G.phase !== 'betting') return;
+  const amount = G.myChip;
+  if (G.myBalance < amount) { addLog('Not enough chips!', 'lose'); return; }
+
+  G.myBalance -= amount;
+  G.myVoted = type;
+
+  const names = { make:'Make It', dont:"Don't Make It", diff_low:'Low Diff (1-2)', diff_high:'High Diff (3-5)' };
+  const odds = { make: parseInt(document.getElementById('make-odds').textContent), dont: parseInt(document.getElementById('dont-odds').textContent), diff_low:18, diff_high:24 };
+
+  if (!G.myBets[type]) G.myBets[type] = { total:0, name:names[type], odds:odds[type] };
+  G.myBets[type].total += amount;
+
+  // Shift crowd sentiment
+  if (type==='make') G.crowdMake = Math.min(85, G.crowdMake+3);
+  else if (type==='dont') G.crowdDont = Math.min(85, G.crowdDont+3);
+  normalise();
+
+  G.crowdBetCount++;
+  document.getElementById('crowd-count').textContent = (G.crowdBetCount + Math.floor(Math.random()*8)) + ' bets placed this round';
+
+  // Highlight voted btn
+  document.getElementById('bet-make-btn').classList.toggle('voted', type==='make');
+  document.getElementById('bet-dont-btn').classList.toggle('voted', type==='dont');
+
+  addLog('You bet '+amount+' chips on '+names[type]);
+  renderMyBets();
+  updateOdds();
+  updateStats();
+
+  // If crowd role, also throw after betting window
+  if (G.role === 'crowd') {
+    document.getElementById('dice-status-text').textContent = 'Bet placed! Waiting for throw...';
+  }
+}
+
+function normalise() {
+  const t = G.crowdMake + G.crowdDont;
+  G.crowdMake = (G.crowdMake/t)*100;
+  G.crowdDont = (G.crowdDont/t)*100;
+}
+
+let autoThrowTimer = null;
+
+function scheduleAutoThrow() {
+  if (G.role !== 'crowd') return;
+  clearTimeout(autoThrowTimer);
+  document.getElementById('dice-status-text').textContent = 'Place your bet...';
+  let t = 8;
+  document.getElementById('bet-timer').textContent = t+'s';
+  const interval = setInterval(() => {
+    t--;
+    document.getElementById('bet-timer').textContent = t > 0 ? t+'s' : '';
+    if (t <= 0) {
+      clearInterval(interval);
+      throwDice();
+    }
+  }, 1000);
+}
+
+function simulateCrowdBets() {
+  // Simulated crowd variance
+  const bias = (Math.random() - 0.5) * 20;
+  G.crowdMake = 50 + bias;
+  G.crowdDont = 50 - bias;
+  normalise();
+  G.crowdBetCount = Math.floor(Math.random()*40)+10;
+  document.getElementById('crowd-count').textContent = G.crowdBetCount + ' bets placed this round';
+  updateOdds();
+}
+
+// ── DICE ──────────────────────────────────────────────
+
+function throwDice() {
+  if (G.phase === 'gameover') return;
+  G.phase = 'throwing';
+  document.getElementById('throw-btn').disabled = true;
+  document.getElementById('bet-make-btn').disabled = true;
+  document.getElementById('bet-dont-btn').disabled = true;
+
+  const d1 = Math.ceil(Math.random()*6);
+  const d2 = Math.ceil(Math.random()*6);
+  const diff = Math.abs(d1-d2);
+
+  const die1el = document.getElementById('die1');
+  const die2el = document.getElementById('die2');
+  die1el.classList.add('rolling');
+  die2el.classList.add('rolling');
+
+  let f=0;
+  const anim = setInterval(()=>{
+    die1el.textContent = DICE_FACES[Math.floor(Math.random()*6)];
+    die2el.textContent = DICE_FACES[Math.floor(Math.random()*6)];
+    f++;
+    if(f>14){
+      clearInterval(anim);
+      die1el.textContent = DICE_FACES[d1-1];
+      die2el.textContent = DICE_FACES[d2-1];
+      die1el.classList.remove('rolling');
+      die2el.classList.remove('rolling');
+      document.getElementById('diff-show').textContent = diff;
+      resolveDice(d1,d2,diff);
+    }
+  },55);
+}
+
+function resolveDice(d1, d2, diff) {
+  G.throwCount++;
+  addLog('Threw '+d1+' & '+d2+' → diff: '+diff, diff===0?'lose':'ev');
+
+  // Pay throw bets
+  payThrowBet(diff);
+
+  if (diff === 0) {
+    addLog("DOUBLE! Game over — shooter fails!", 'lose');
+    payGameBet('dont');
+    showOutcome(false);
+    return;
+  }
+
+  let newPos = G.pos + diff;
+  if (newPos === G.ladderSize) {
+    G.pos = newPos;
+    renderLadder();
+    addLog('MADE IT! Shooter reaches '+G.ladderSize+'!', 'win');
+    payGameBet('make');
+    setTimeout(()=>showOutcome(true), 400);
+    return;
+  }
+  if (newPos > G.ladderSize) {
+    newPos = G.ladderSize - (newPos - G.ladderSize);
+    addLog('Overshoot! Bounces back to '+newPos+'.', 'ev');
+  }
+  G.pos = newPos;
+  renderLadder();
+  G.phase = 'betting';
+  G.myVoted = null;
+  G.myBets = {};
+  document.getElementById('bet-make-btn').classList.remove('voted');
+  document.getElementById('bet-dont-btn').classList.remove('voted');
+  document.getElementById('bet-make-btn').disabled = false;
+  document.getElementById('bet-dont-btn').disabled = false;
+  document.getElementById('throw-btn').disabled = false;
+  addLog('Now at rung '+G.pos+'. Need '+(G.ladderSize-G.pos)+' more.', 'ev');
+  simulateCrowdBets();
+  updateOdds();
+  renderMyBets();
+  if (G.role==='crowd') scheduleAutoThrow();
+  else document.getElementById('dice-status-text').textContent = 'Place bets, then throw!';
+}
+
+function payThrowBet(diff) {
+  const lowKey = 'diff_low', highKey = 'diff_high';
+  if (diff===1||diff===2) {
+    const b = G.myBets[lowKey];
+    if (b) { const win = Math.floor(b.total*(1+18/10)); G.myBalance+=win; addLog('You win '+win+' on Low Diff!','win'); }
+  }
+  if (diff>=3) {
+    const b = G.myBets[highKey];
+    if (b) { const win = Math.floor(b.total*(1+24/10)); G.myBalance+=win; addLog('You win '+win+' on High Diff!','win'); }
+  }
+}
+
+function payGameBet(outcome) {
+  const b = G.myBets[outcome];
+  if (b) {
+    const win = Math.floor(b.total*(1+b.odds/10));
+    G.myBalance += win;
+    addLog('You win '+win+' chips on '+b.name+'!','win');
+  }
+}
+
+// ── OUTCOMES ──────────────────────────────────────────
+
+function showOutcome(win) {
+  G.phase = 'gameover';
+  const box = document.getElementById('outcome-box');
+  const overlay = document.getElementById('outcome-overlay');
+
+  document.getElementById('o-icon').textContent = win ? '🏆' : '💀';
+  document.getElementById('o-title').textContent = win ? 'MADE IT!' : 'WIPED OUT!';
+
+  const crowdRight = (win && G.myVoted==='make') || (!win && G.myVoted==='dont');
+  const crowdWrong = (win && G.myVoted==='dont') || (!win && G.myVoted==='make');
+
+  let subText = win
+    ? 'The shooter reached the top exactly!'
+    : 'A double ended the game!';
+  if (crowdRight) subText += '\n✅ You called it right!';
+  if (crowdWrong) subText += '\n❌ You backed the wrong side.';
+
+  document.getElementById('o-sub').textContent = subText;
+  document.getElementById('o-winnings').textContent = win
+    ? '+ ' + G.myBalance.toLocaleString() + ' chips'
+    : '';
+
+  box.className = 'outcome-box ' + (win ? 'win-box' : 'lose');
+
+  // Card logic
+  if (win) {
+    G.wins++;
+    G.streak++;
+    const card = earnCard();
+    if (card) {
+      document.getElementById('o-card-earned').innerHTML =
+        '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;color:var(--gold);letter-spacing:.2em;margin-bottom:8px">🃏 CARD EARNED!</div>' +
+        '<div style="display:flex;justify-content:center">' + buildCardHTML(card, false) + '</div>';
+      showCardToast(card);
+    }
+  } else {
+    G.streak = 0;
+    document.getElementById('o-card-earned').innerHTML = '';
+  }
+
+  overlay.classList.add('show');
+  if (win) launchConfetti();
+  updateStats();
+}
+
+function earnCard() {
+  let pool;
+  if (G.streak >= 7) pool = CARD_DEFS.filter(c=>c.tier==='legendary');
+  else if (G.streak >= 5) pool = CARD_DEFS.filter(c=>c.tier==='epic');
+  else if (G.streak >= 3) pool = CARD_DEFS.filter(c=>c.tier==='rare');
+  else pool = CARD_DEFS.filter(c=>c.tier==='common');
+
+  // Pick one not already owned
+  const unowned = pool.filter(c => !G.myCards.find(mc=>mc.id===c.id));
+  if (!unowned.length) pool = CARD_DEFS.filter(c=>!G.myCards.find(mc=>mc.id===c.id));
+  if (!pool.length) return null;
+
+  const card = pool[Math.floor(Math.random()*pool.length)];
+  G.myCards.push(card);
+  saveCards();
+  return card;
+}
+
+function showCardToast(card) {
+  const t = document.createElement('div');
+  t.className = 'card-toast';
+  t.innerHTML = `<div class="toast-icon">${card.icon}</div><div class="toast-text"><div class="toast-title">${card.name}</div><div style="color:var(--text-mid)">${card.tier.toUpperCase()} card earned!</div></div>`;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 4000);
+}
+
+function showCardDetail(card) {
+  alert(`${card.icon} ${card.name}\nTier: ${card.tier.toUpperCase()}\nPower: ${card.power}\n${card.stat}: ${card.statVal}\n\nThis card is part of your LaScala collection.`);
+}
+
+function nextRound() {
+  document.getElementById('outcome-overlay').classList.remove('show');
+  G.round++;
+  G.pos = G.startPos;
+  G.myBets = {};
+  G.myVoted = null;
+  G.throwCount = 0;
+  G.phase = 'betting';
+  document.getElementById('bet-make-btn').disabled = false;
+  document.getElementById('bet-dont-btn').disabled = false;
+  document.getElementById('throw-btn').disabled = false;
+  document.getElementById('die1').textContent = '?';
+  document.getElementById('die2').textContent = '?';
+  document.getElementById('diff-show').textContent = '—';
+  document.getElementById('o-card-earned').innerHTML = '';
+
+  // Slightly adjust fake leaderboard
+  G.leaderboard = G.leaderboard.map(p => p.isMe ? p : {...p, chips: Math.max(100, p.chips + Math.floor((Math.random()-.4)*200))});
+
+  simulateCrowdBets();
+  renderAll();
+  addLog('─── Round '+G.round+' ───', 'ev');
+  if (G.role==='crowd') scheduleAutoThrow();
+}
+
+function resetGame() {
+  G.round=1; G.wins=0; G.streak=0;
+  G.myBalance=1000; G.myBets={}; G.myVoted=null;
+  G.phase='betting'; G.throwCount=0;
+  document.getElementById('setup-screen').style.display='flex';
+  clearTimeout(autoThrowTimer);
+}
+
+// ── CARDS PERSISTENCE ─────────────────────────────────
+
+function saveCards() {
+  try { localStorage.setItem('lascala_cards', JSON.stringify(G.myCards)); } catch(e){}
+}
+function loadCards() {
+  try {
+    const saved = localStorage.getItem('lascala_cards');
+    if (saved) G.myCards = JSON.parse(saved);
+  } catch(e){}
+}
+
+// ── HELPERS ───────────────────────────────────────────
+
+function probToOdds(p) {
+  if(p<=0) return 999;
+  return Math.round((1/p-1)*10);
+}
+
+function calcMakeProb(pos, top) {
+  const rem = top-pos;
+  if(rem<=0) return 1;
+  const map={1:.278,2:.278,3:.278,4:.306,5:.278,6:.25,7:.222,8:.194,9:.167,10:.14,11:.12,12:.09,13:.06,14:.04,15:.02};
+  return map[rem] || Math.max(.02, .3-rem*.02);
+}
+
+function addLog(msg, type) {
+  const c = document.getElementById('game-log');
+  const el = document.createElement('div');
+  el.className = 'log-entry' + (type?' '+type:'');
+  el.textContent = msg;
+  c.insertBefore(el, c.firstChild);
+}
+
+function launchConfetti() {
+  const cols=['#c9a84c','#f0c840','#2dc653','#4cc9f0','#7209b7','#ffffff'];
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.left=Math.random()*100+'vw';
+    el.style.background=cols[Math.floor(Math.random()*cols.length)];
+    el.style.borderRadius=Math.random()>.5?'50%':'0';
+    el.style.width=el.style.height=(6+Math.random()*8)+'px';
+    el.style.animationDuration=(1.5+Math.random()*2)+'s';
+    el.style.animationDelay=Math.random()*.4+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),4000);
+  }
+}
+</script>
+</body>
+</html>

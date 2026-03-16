@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaScala LIVE — Guide & Operator Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400&family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080f;--bg2:#0f0f1a;--bg3:#161625;
+  --gold:#c9a84c;--gold2:#f0c840;--gold-dim:#3a2e10;
+  --red:#e63946;--green:#2dc653;--cyan:#4cc9f0;--purple:#7209b7;
+  --border:#252538;--text:#e8e2d4;--text-mid:#7a7090;--text-dim:#3a3450;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;line-height:1.7}
+
+/* NAV */
+.top-nav{
+  background:rgba(8,8,15,.97);border-bottom:1px solid var(--border);
+  padding:14px 30px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.15em;
+  background:linear-gradient(135deg,#6a5020,#c9a84c,#f0c840,#c9a84c,#6a5020);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{
+  padding:7px 16px;border:1px solid var(--border);border-radius:6px;
+  background:transparent;color:var(--text-mid);font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.15em;cursor:pointer;transition:all .2s;
+}
+.nav-tab.active,.nav-tab:hover{border-color:var(--gold-dim);color:var(--gold);background:#1a1608;}
+
+/* PANELS */
+.panel{display:none;max-width:880px;margin:0 auto;padding:50px 30px;}
+.panel.active{display:block;}
+
+/* HERO */
+.hero{
+  text-align:center;padding:60px 20px 40px;
+  border-bottom:1px solid var(--border);margin-bottom:50px;
+  background:radial-gradient(ellipse 60% 40% at 50% 60%,rgba(201,168,76,.07) 0%,transparent 70%);
+}
+.hero-badge{
+  display:inline-block;border:1px solid var(--gold-dim);
+  color:var(--gold);font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.3em;padding:5px 14px;
+  border-radius:20px;margin-bottom:20px;
+}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,12vw,110px);
+  letter-spacing:.12em;line-height:1;
+  background:linear-gradient(135deg,#6a5020,#c9a84c,#f0c840,#c9a84c,#6a5020);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 30px rgba(201,168,76,.2));}
+.hero-sub{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:var(--text-mid);margin:10px 0 24px;}
+.hero-desc{max-width:560px;margin:0 auto;font-size:16px;color:#a09888;line-height:1.9;}
+.hero-desc strong{color:var(--gold);}
+
+/* SECTIONS */
+.section{margin-bottom:56px;}
+.section-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--bg3);border:1px solid var(--border);border-radius:20px;
+  padding:5px 14px;font-family:'DM Mono',monospace;font-size:11px;
+  letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:16px;
+}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:.08em;
+  color:var(--text);line-height:1.1;margin-bottom:18px;}
+.section-title span{color:var(--gold);}
+p{margin-bottom:14px;font-size:15px;color:#a09888;line-height:1.85;}
+p strong{color:var(--text);font-weight:700;}
+h3{font-weight:700;font-size:17px;color:var(--text);margin:24px 0 10px;
+  padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* CALLOUTS */
+.callout{border-radius:8px;padding:18px 22px;margin:18px 0;border-left:4px solid;}
+.callout-gold{background:#1a1608;border-color:var(--gold);}
+.callout-green{background:#0a1a0d;border-color:var(--green);}
+.callout-red{background:#1a0808;border-color:var(--red);}
+.callout-blue{background:#0a0d1a;border-color:var(--cyan);}
+.callout-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.2em;
+  text-transform:uppercase;margin-bottom:6px;}
+.callout-gold .callout-title{color:var(--gold);}
+.callout-green .callout-title{color:var(--green);}
+.callout-red .callout-title{color:var(--red);}
+.callout-blue .callout-title{color:var(--cyan);}
+.callout p{margin:0;font-size:14px;}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:16px;margin:20px 0;}
+.step{
+  display:flex;gap:18px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:20px;align-items:flex-start;transition:all .2s;
+}
+.step:hover{border-color:var(--gold-dim);}
+.step-num{
+  width:40px;height:40px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+  color:var(--bg);font-family:'Bebas Neue',sans-serif;font-size:22px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+}
+.step-body h4{font-weight:700;font-size:16px;color:var(--text);margin-bottom:5px;}
+.step-body p{font-size:13px;margin:0;}
+
+/* CARDS SHOWCASE */
+.cards-showcase{
+  display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:24px 0;
+}
+.demo-card{
+  width:130px;height:182px;border-radius:10px;
+  display:flex;flex-direction:column;overflow:hidden;
+  transition:transform .25s;cursor:default;
+  border:2px solid;
+}
+.demo-card:hover{transform:translateY(-8px) scale(1.05);}
+.demo-card.common{background:linear-gradient(160deg,#1a1a2e,#16213e);border-color:#3a3a5a;}
+.demo-card.rare{background:linear-gradient(160deg,#0d1b2a,#1b4965);border-color:#4cc9f0;box-shadow:0 0 12px rgba(76,201,240,.2);}
+.demo-card.epic{background:linear-gradient(160deg,#1a0d2e,#2d1b69);border-color:#7209b7;box-shadow:0 0 16px rgba(114,9,183,.3);}
+.demo-card.legendary{background:linear-gradient(160deg,#1a1205,#2e2008);border-color:var(--gold);box-shadow:0 0 22px rgba(201,168,76,.4);animation:leg-shine 3s ease-in-out infinite;}
+@keyframes leg-shine{0%,100%{box-shadow:0 0 22px rgba(201,168,76,.4)}50%{box-shadow:0 0 38px rgba(201,168,76,.75)}}
+.dc-tier{font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:.25em;padding:5px 8px 0;text-align:center;}
+.common .dc-tier{color:#5a5a8a;}.rare .dc-tier{color:var(--cyan);}.epic .dc-tier{color:#b44bff;}.legendary .dc-tier{color:var(--gold2);}
+.dc-icon{flex:1;display:flex;align-items:center;justify-content:center;font-size:42px;}
+.dc-name{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.1em;text-align:center;padding:0 6px 3px;color:var(--text);}
+.dc-stat{display:flex;justify-content:space-between;padding:3px 8px;border-top:1px solid rgba(255,255,255,.08);font-family:'DM Mono',monospace;font-size:9px;color:var(--text-mid);}
+.dc-power{font-family:'Bebas Neue',sans-serif;font-size:16px;text-align:center;padding:3px 0 6px;}
+.common .dc-power{color:#7a7aaa;}.rare .dc-power{color:var(--cyan);}.epic .dc-power{color:#b44bff;}.legendary .dc-power{color:var(--gold2);}
+
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0;}
+.data-table th{background:var(--bg3);color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+.data-table td{padding:10px 14px;border-bottom:1px solid #16162a;color:#a09888;}
+.data-table tr:hover td{background:var(--bg3);}
+td.hi{color:var(--gold);font-weight:700;}
+td.gr{color:var(--green);}
+td.rd{color:var(--red);}
+
+/* FLOW */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0;}
+.flow-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center;}
+.flow-icon{font-size:28px;margin-bottom:8px;}
+.flow-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.12em;color:var(--text);margin-bottom:4px;}
+.flow-body{font-size:11px;color:var(--text-mid);line-height:1.6;}
+
+/* ROADMAP */
+.roadmap{display:flex;flex-direction:column;gap:12px;margin:20px 0;}
+.road-item{
+  display:flex;gap:14px;align-items:flex-start;padding:14px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+}
+.road-status{
+  width:70px;font-family:'Bebas Neue',sans-serif;font-size:11px;
+  letter-spacing:.1em;padding:3px 6px;border-radius:3px;
+  text-align:center;flex-shrink:0;margin-top:2px;
+}
+.status-live{background:#0a1a0d;color:var(--green);}
+.status-soon{background:#1a1608;color:var(--gold);}
+.status-future{background:#1a0d1a;color:#b44bff;}
+.road-text h4{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.road-text p{font-size:12px;margin:0;color:var(--text-mid);}
+
+/* FAQ */
+.faq{display:flex;flex-direction:column;gap:2px;margin:16px 0;}
+.faq-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.faq-q{padding:14px 18px;font-weight:700;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.faq-q::after{content:'+';color:var(--gold);font-size:20px;font-weight:300;}
+.faq-item.open .faq-q::after{content:'−';}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s;padding:0 18px;font-size:13px;color:var(--text-mid);line-height:1.8;}
+.faq-item.open .faq-a{max-height:300px;padding:0 18px 14px;}
+
+/* OPERATOR SECTION */
+.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+@media(max-width:540px){.op-grid{grid-template-columns:1fr;}}
+.op-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px;}
+.op-card-icon{font-size:24px;margin-bottom:8px;}
+.op-card-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.1em;color:var(--text);margin-bottom:6px;}
+.op-card-body{font-size:12px;color:var(--text-mid);line-height:1.7;}
+
+footer{text-align:center;padding:40px;border-top:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--text-dim);letter-spacing:.15em;}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="nav-logo">LaScala LIVE</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('players')">👥 Players</button>
+    <button class="nav-tab" onclick="showTab('cards')">🃏 Cards</button>
+    <button class="nav-tab" onclick="showTab('operator')">⚙️ Operator</button>
+    <button class="nav-tab" onclick="showTab('roadmap')">🚀 Roadmap</button>
+  </div>
+</div>
+
+<!-- ══ PLAYERS TAB ══ -->
+<div class="panel active" id="tab-players">
+  <div class="hero">
+    <div class="hero-badge">LaScala LIVE · How to Play</div>
+    <div class="hero-title">LIVE</div>
+    <div class="hero-sub">The Crowd Game</div>
+    <div class="hero-desc">
+      One shooter. One ladder. <strong>Unlimited crowd.</strong><br>
+      Watch the game unfold in real time — bet on every throw, earn cards, climb the leaderboard.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">① What Is LaScala LIVE?</div>
+    <div class="section-title">Same Game.<br><span>Bigger Stakes.</span></div>
+    <p>LaScala LIVE takes the core LaScala ladder game and opens it up to a crowd. One person is the <strong>Shooter</strong> — they climb the ladder, they throw the dice. Everyone else is the <strong>Crowd</strong> — they watch, they bet, they win or lose chips based on what happens.</p>
+    <p>You never have to shoot if you don't want to. Being in the crowd is its own game — reading the odds, backing your instincts, watching the momentum shift on every single throw.</p>
+
+    <div class="flow">
+      <div class="flow-card"><div class="flow-icon">🎲</div><div class="flow-title">Pick a Role</div><div class="flow-body">Be the Shooter or join the Crowd. Both have different skills and different rewards.</div></div>
+      <div class="flow-card"><div class="flow-icon">👀</div><div class="flow-title">Watch Live</div><div class="flow-body">The ladder updates on every throw. The crowd sees exactly what the shooter sees.</div></div>
+      <div class="flow-card"><div class="flow-icon">💰</div><div class="flow-title">Bet Each Throw</div><div class="flow-body">Before every throw, place chips on Make It, Don't Make It, Low or High diff.</div></div>
+      <div class="flow-card"><div class="flow-icon">🃏</div><div class="flow-title">Earn Cards</div><div class="flow-body">Win rounds to earn Prize Cards. Rarer cards for bigger streaks.</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">② The Two Roles</div>
+    <div class="section-title">Shooter<br><span>or Crowd?</span></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0">
+      <div class="callout callout-gold">
+        <div class="callout-title">🎲 The Shooter</div>
+        <p>You climb the ladder. You throw the dice. The crowd bets on you. Choose your start position — high for a fast game, low for drama. Every throw is yours. The tension is all on you. Win by landing exactly on top. Lose by rolling a double at any point.</p>
+      </div>
+      <div class="callout callout-blue">
+        <div class="callout-title">👥 The Crowd</div>
+        <p>You watch. You bet. You don't touch the dice. Before each throw a timer counts down — place your chips on Make It, Don't Make It, or the likely diff range. When the dice fall, your bets resolve immediately. A betting timer auto-advances if you don't bet in time.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">③ Your Bets</div>
+    <div class="section-title">What You Can<br><span>Bet On</span></div>
+
+    <table class="data-table">
+      <thead><tr><th>Bet</th><th>What it means</th><th>Pays when</th><th>Odds</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Make It</strong></td><td>Shooter reaches the top exactly</td><td>Game ends in a win</td><td class="hi">Live — shifts each throw</td></tr>
+        <tr><td><strong>Don't Make It</strong></td><td>Shooter rolls a double</td><td>Game ends in a loss</td><td class="hi">Live — shifts each throw</td></tr>
+        <tr><td><strong>Low Diff (1–2)</strong></td><td>Next throw = difference 1 or 2</td><td>Immediately that throw</td><td class="gr">1.8/10</td></tr>
+        <tr><td><strong>High Diff (3–5)</strong></td><td>Next throw = difference 3, 4, or 5</td><td>Immediately that throw</td><td class="gr">2.4/10</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-green">
+      <div class="callout-title">Watch the Crowd Bar</div>
+      <p>The green/red bar above the betting buttons shows how the crowd is split right now. If 80% of chips are on Make It, the crowd is bullish. Sometimes following the crowd is smart. Sometimes fading it is smarter. Your call.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">④ Step by Step</div>
+    <div class="section-title">How a<br><span>Round Works</span></div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Enter Your Name & Pick a Role</h4><p>Shooter or Crowd. Choose your ladder length. Join the game.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Betting Window Opens</h4><p>A countdown timer gives you time to place your chips. Click Make It, Don't Make It, Low, or High. You can bet multiple times on different outcomes. If you're crowd, the timer auto-throws when it reaches zero.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Dice Are Thrown</h4><p>Shooter throws (or the timer auto-throws for crowd play). Watch the dice animate. The difference moves the shooter on the ladder.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Bets Resolve</h4><p>Throw bets (Low/High diff) pay out immediately. Make It / Don't Make It bets stay live until the game ends. Winnings added to your chip balance instantly.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Game Ends — Earn Your Card</h4><p>Shooter lands on top (win) or rolls a double (loss). Game bets pay out. If you called it right, you earn chips. Win rounds to unlock Prize Cards — rarer cards for longer win streaks.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Next Round</h4><p>Position resets. Leaderboard updates. New betting window opens. Keep going.</p></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">⑤ Tips</div>
+    <div class="section-title">Playing<br><span>Smart</span></div>
+    <div class="faq">
+      <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">When should I bet Make It?</div><div class="faq-a">Early, when the shooter is far from the top and the odds are long. If they make it, you've got a big return. If they don't, you haven't bet much. The odds shorten as they get closer — so early Make It bets are high risk, high reward.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">When should I bet Don't Make It?</div><div class="faq-a">When the shooter is near the top but not there yet. That's when the odds on Don't Make It are at their longest — because there's still a double lurking. One bad throw and the crowd's hopes are gone.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What are Low and High diff bets?</div><div class="faq-a">These are bets on the next throw only. Low (diff 1 or 2) is more likely — happens on 18 out of 36 throws. High (diff 3, 4, or 5) is less likely but pays more. Both pay immediately regardless of game outcome. Good for action when you're not sure about the overall game direction.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Can I bet both Make It and Don't Make It?</div><div class="faq-a">Yes. And if you time it right — betting one early at long odds and the other later when those odds have lengthened — you can guarantee a return regardless of outcome. This is the LaScala Hedge. Advanced play. Very satisfying when it works.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What happens if I run out of chips?</div><div class="faq-a">Start a new game to reset your balance back to 1,000 virtual chips. Your Prize Cards are saved and won't be lost. Only your chip balance resets.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CARDS TAB ══ -->
+<div class="panel" id="tab-cards">
+  <div class="hero">
+    <div class="hero-badge">LaScala LIVE · Prize Cards</div>
+    <div class="hero-title">CARDS</div>
+    <div class="hero-sub">Collect. Trade. Flex.</div>
+    <div class="hero-desc">Win rounds to earn <strong>LaScala Prize Cards</strong>. Four rarity tiers. Collector value. Trade codes coming. Every card is proof you played — and won.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">① The Four Tiers</div>
+    <div class="section-title">Rarity<br><span>Levels</span></div>
+
+    <div class="cards-showcase">
+      <div class="demo-card common">
+        <div class="dc-tier">COMMON</div>
+        <div class="dc-icon">🎲</div>
+        <div class="dc-name">First Throw</div>
+        <div class="dc-stat"><span>Luck</span><span>+5%</span></div>
+        <div class="dc-power" style="color:#7a7aaa">12</div>
+      </div>
+      <div class="demo-card rare">
+        <div class="dc-tier">RARE</div>
+        <div class="dc-icon">⚡</div>
+        <div class="dc-name">Hot Streak</div>
+        <div class="dc-stat"><span>Speed</span><span>+15%</span></div>
+        <div class="dc-power" style="color:var(--cyan)">45</div>
+      </div>
+      <div class="demo-card epic">
+        <div class="dc-tier">EPIC</div>
+        <div class="dc-icon">💎</div>
+        <div class="dc-name">Diamond Run</div>
+        <div class="dc-stat"><span>Purity</span><span>+35%</span></div>
+        <div class="dc-power" style="color:#b44bff">120</div>
+      </div>
+      <div class="demo-card legendary">
+        <div class="dc-tier">LEGENDARY</div>
+        <div class="dc-icon">👑</div>
+        <div class="dc-name">The Crown</div>
+        <div class="dc-stat"><span>Reign</span><span>∞</span></div>
+        <div class="dc-power" style="color:var(--gold2)">500</div>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr><th>Tier</th><th>How to Earn</th><th>Card Count</th><th>Tradeable</th></tr></thead>
+      <tbody>
+        <tr><td style="color:#7a7aaa">⬜ COMMON</td><td>Win any round</td><td>4 cards</td><td class="gr">Yes (v2)</td></tr>
+        <tr><td style="color:var(--cyan)">🟦 RARE</td><td>Win 3 rounds in a row</td><td>3 cards</td><td class="gr">Yes (v2)</td></tr>
+        <tr><td style="color:#b44bff">🟪 EPIC</td><td>Win 5 rounds in a row</td><td>2 cards</td><td class="gr">Yes (v2)</td></tr>
+        <tr><td style="color:var(--gold2)">🟨 LEGENDARY</td><td>Win 7 rounds in a row</td><td>2 cards</td><td class="gr">Yes (v2)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">② Card Details</div>
+    <div class="section-title">Every Card<br><span>Is Different</span></div>
+    <p>Each card has three stats: a <strong>Power rating</strong> (the big number at the bottom), a <strong>Special stat</strong> unique to that card, and a <strong>Tier</strong> that determines its rarity and collectability.</p>
+    <p>Cards currently serve as collectables and achievement markers — proof of your win streaks. In a future version, card Power ratings will feed into a Top Trumps-style head-to-head game against other collectors.</p>
+
+    <div class="callout callout-gold">
+      <div class="callout-title">Cards Are Saved Automatically</div>
+      <p>Your card collection is saved to your browser. You won't lose it when you close the tab. To transfer cards to a new device or trade with others, a shareable card code system is coming in the next version.</p>
+    </div>
+
+    <div class="callout callout-blue">
+      <div class="callout-title">Future: Card Trading</div>
+      <p>Version 2 of LaScala LIVE will introduce unique card codes — a string you can copy and share. Send your code to another player; they enter it and add your card to their collection. Rare and Legendary cards with low print runs will have genuine collector scarcity. Cards earned early — before the player base grows — will be the rarest.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">③ The Collection Game</div>
+    <div class="section-title">Why Cards<br><span>Matter</span></div>
+    <p>Prize Cards borrow from the same psychology that makes Pokémon, Panini stickers, and Top Trumps addictive: <strong>the desire to complete a set</strong>. Once you have two common cards, you want all four. Once you have a rare, you want an epic.</p>
+    <p>The streak mechanic is deliberately hard. Winning 7 in a row to earn a Legendary card is genuinely difficult — every round has a real chance of ending in a double. That rarity is earned, not given. Players who have a Legendary card deserve to show it off.</p>
+    <p>In the roadmap, card Power ratings will unlock exclusive game features, bonus starting positions, and early access to new game variants. Cards become your LaScala passport.</p>
+  </div>
+</div>
+
+<!-- ══ OPERATOR TAB ══ -->
+<div class="panel" id="tab-operator">
+  <div class="hero">
+    <div class="hero-badge">LaScala LIVE · Operator Brief</div>
+    <div class="hero-title">OPERATOR</div>
+    <div class="hero-sub">Running LaScala LIVE</div>
+    <div class="hero-desc">Everything you need to know about deploying, hosting, and managing <strong>LaScala LIVE</strong> as a public-facing crowd game.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">① What It Is</div>
+    <div class="section-title">The Product<br><span>Overview</span></div>
+    <p>LaScala LIVE is a browser-based crowd betting game built on the LaScala game mechanic. It operates entirely in virtual chips — no real money changes hands in this version. It is a social gaming and audience engagement product, legally equivalent to a free-to-play game with a virtual economy.</p>
+
+    <div class="callout callout-green">
+      <div class="callout-title">Legal Status — Current Version</div>
+      <p>LaScala LIVE v1 uses virtual chips only. No real money is wagered, won, or lost. Under UK and most international law, virtual chip games do not constitute gambling and do not require a gambling licence. This is the same legal basis as social casino games (Zynga Poker, House of Fun, etc.).</p>
+    </div>
+
+    <div class="callout callout-red">
+      <div class="callout-title">Important: Real Money Version</div>
+      <p>Any future version incorporating real money stakes requires a full gambling licence from the relevant jurisdiction (e.g. UK Gambling Commission). Do not introduce real money mechanics without obtaining appropriate legal and regulatory clearance first.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">② Deployment</div>
+    <div class="section-title">How to<br><span>Run It</span></div>
+    <p>The current version is a single self-contained HTML file. No server, no database, no installation. It runs in any browser on any device.</p>
+
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>What it means</th><th>Cost</th><th>Complexity</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Share the file</strong></td><td>Send the HTML file to players. They open in browser.</td><td class="gr">Free</td><td class="gr">Zero</td></tr>
+        <tr><td><strong>GitHub Pages</strong></td><td>Host free on github.io — same as your Carcophony games.</td><td class="gr">Free</td><td class="gr">Low</td></tr>
+        <tr><td><strong>Netlify / Vercel</strong></td><td>Drag and drop hosting. Live URL in 2 minutes.</td><td class="gr">Free tier</td><td class="gr">Low</td></tr>
+        <tr><td><strong>Custom domain</strong></td><td>lascala.com or similar. Hosted as above.</td><td class="hi">~£10/yr</td><td>Low</td></tr>
+        <tr><td><strong>Embedded in casino</strong></td><td>Iframe within operator's existing platform.</td><td>Varies</td><td>Medium</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-gold">
+      <div class="callout-title">Recommended for Now</div>
+      <p>Host on GitHub Pages exactly as your Carcophony games are hosted. Free, instant, shareable URL. Takes about 10 minutes if you follow the same process you already know.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">③ The Crowd Mechanic</div>
+    <div class="section-title">How the<br><span>Crowd Works</span></div>
+    <p>In the current version, the "crowd" is simulated for single-player use. When a player joins as Crowd, they see a fake leaderboard of named players and a crowd sentiment bar — these are generated randomly to create the feeling of a live game.</p>
+    <p>The real multiplayer version — where actual different people see the same game simultaneously — requires a lightweight server to synchronise game state. This is Version 2 and is described in the Roadmap tab.</p>
+
+    <div class="op-grid">
+      <div class="op-card"><div class="op-card-icon">🎲</div><div class="op-card-title">Shooter Role</div><div class="op-card-body">One player controls the dice. They throw at their own pace. Crowd has a timer that auto-advances if they don't bet — keeping the game moving regardless.</div></div>
+      <div class="op-card"><div class="op-card-icon">👥</div><div class="op-card-title">Crowd Role</div><div class="op-card-body">Player watches and bets. An 8-second countdown runs before each throw. If crowd bets before timer expires, their bet is placed. Timer auto-throws after countdown regardless.</div></div>
+      <div class="op-card"><div class="op-card-icon">📊</div><div class="op-card-title">Sentiment Bar</div><div class="op-card-body">Shows simulated crowd split between Make It and Don't Make It. Updates when player bets. In real multiplayer, reflects actual vote distribution.</div></div>
+      <div class="op-card"><div class="op-card-icon">🏆</div><div class="op-card-title">Leaderboard</div><div class="op-card-body">Populated with simulated players in v1. In multiplayer, reflects real player chip rankings. Player's own position always highlighted.</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">④ The Card Economy</div>
+    <div class="section-title">Cards as<br><span>Retention</span></div>
+    <p>The Prize Card system is a deliberate retention mechanic. Players who have earned cards have a reason to come back — to complete the set, to reach the next rarity tier, to build the streak. Cards saved to browser storage persist between sessions.</p>
+
+    <table class="data-table">
+      <thead><tr><th>Card Tier</th><th>Difficulty</th><th>Scarcity Signal</th><th>Retention Value</th></tr></thead>
+      <tbody>
+        <tr><td>Common</td><td>Win once</td><td>Low</td><td>Entry hook</td></tr>
+        <tr><td>Rare</td><td>Win 3 in a row</td><td>Medium</td><td>Return visits</td></tr>
+        <tr><td>Epic</td><td>Win 5 in a row</td><td>High</td><td>Habitual play</td></tr>
+        <tr><td class="hi">Legendary</td><td>Win 7 in a row</td><td>Very High</td><td class="gr">Social sharing &amp; prestige</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-blue">
+      <div class="callout-title">Operator Opportunity — Limited Edition Cards</div>
+      <p>Future versions allow operators to issue time-limited or event-specific cards — a "Grand Opening" card, a "Tournament Champion" card, a seasonal series. These create urgency and community. Players who earn them before the window closes have something genuinely scarce.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">⑤ Analytics & Moderation</div>
+    <div class="section-title">What to<br><span>Watch</span></div>
+    <p>In the current single-file version, there is no server-side analytics. For production deployment, the following metrics should be tracked:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>Why It Matters</th></tr></thead>
+      <tbody>
+        <tr><td>Sessions per day</td><td>Overall engagement baseline</td></tr>
+        <tr><td>Rounds per session</td><td>Retention — are players staying?</td></tr>
+        <tr><td>Bet distribution (Make/Don't)</td><td>Game balance — is crowd behaving rationally?</td></tr>
+        <tr><td>Card earn rate by tier</td><td>Are Legendary cards being earned too easily or never?</td></tr>
+        <tr><td>Session length by role</td><td>Is Shooter vs Crowd role balance healthy?</td></tr>
+        <tr><td>Return rate (day 1, day 7)</td><td>Core retention signal for card mechanic effectiveness</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">⑥ Intellectual Property</div>
+    <div class="section-title">IP<br><span>Notice</span></div>
+    <div class="callout callout-red">
+      <div class="callout-title">Copyright & Licence</div>
+      <p>LaScala LIVE is proprietary software. The game mechanics, betting structure, Prize Card system, and all associated assets are © Matchless Games Limited. Deployment by any party other than Matchless Games Limited or a licensed operator is not permitted. The virtual chip economy, card rarity system, and crowd mechanic are proprietary product features protected under the same IP framework as the core LaScala game. Contact Matchless Games Limited for licensing enquiries.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ROADMAP TAB ══ -->
+<div class="panel" id="tab-roadmap">
+  <div class="hero">
+    <div class="hero-badge">LaScala LIVE · What's Coming</div>
+    <div class="hero-title">ROADMAP</div>
+    <div class="hero-sub">Where this is going</div>
+    <div class="hero-desc">LaScala LIVE v1 is the proof of concept. Here's the full picture of where it goes from here.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">The Plan</div>
+    <div class="section-title">Version by<br><span>Version</span></div>
+
+    <div class="roadmap">
+      <div class="road-item">
+        <div class="road-status status-live">LIVE NOW</div>
+        <div class="road-text"><h4>v1 — Single Player LIVE Simulation</h4><p>Full game with simulated crowd. Four bet types. Prize Cards with browser persistence. Leaderboard simulation. Virtual chips. Works on any device, no server needed.</p></div>
+      </div>
+      <div class="road-item">
+        <div class="road-status status-soon">NEXT</div>
+        <div class="road-text"><h4>v2 — Real Multiplayer (Same Room)</h4><p>Lightweight server (Node.js + WebSockets). Multiple players in a shared session. One real shooter, real crowd placing real bets simultaneously. Live crowd sentiment bar reflects actual bets. Shared leaderboard persists between sessions.</p></div>
+      </div>
+      <div class="road-item">
+        <div class="road-status status-soon">v3</div>
+        <div class="road-text"><h4>Card Trading System</h4><p>Unique card codes for each earned card. Copy your code, send to a friend, they add your card to their collection. Print-run scarcity — once 100 copies of a card exist, it's capped. Early players get the rarest print numbers.</p></div>
+      </div>
+      <div class="road-item">
+        <div class="road-status status-soon">v4</div>
+        <div class="road-text"><h4>Card vs Card — Top Trumps Mode</h4><p>Challenge another player's card with yours. Power ratings decide the winner. Cards earn XP. Levelled cards unlock bonus features in the main game. The collection becomes the meta-game.</p></div>
+      </div>
+      <div class="road-item">
+        <div class="road-status status-future">FUTURE</div>
+        <div class="road-text"><h4>Tournament Mode</h4><p>Scheduled live tournaments. Fixed start time, shared ladder, hundreds of crowd players. Prize pools in exclusive cards. Spectator mode for non-players. Leaderboard with live position updates.</p></div>
+      </div>
+      <div class="road-item">
+        <div class="road-status status-future">FUTURE</div>
+        <div class="road-text"><h4>Licensed Real Money Version</h4><p>Pool betting product. Real stakes. Requires UK Gambling Commission licence (or equivalent). House margin on all bets. This is the commercial product described in the LaScala Operator document.</p></div>
+      </div>
+      <div class="road-item">
+        <div class="road-status status-future">FUTURE</div>
+        <div class="road-text"><h4>Operator White Label</h4><p>Casino operators license the full LaScala LIVE platform under their own brand. Custom ladder lengths, custom card designs, custom chip denominations. Revenue share model.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-badge">The Big Picture</div>
+    <div class="section-title">What You're<br><span>Building</span></div>
+    <p>LaScala LIVE is not just a game. It's the beginning of a <strong>crowd betting ecosystem</strong> built on a mathematically novel game mechanic. The path from here to a licensed, revenue-generating product is clear and each version builds the audience for the next.</p>
+    <p>The card system creates a collector community independent of the gambling mechanic — people can play, collect, and trade without a penny of real money involved. That community becomes the marketing engine when the real money version launches.</p>
+    <div class="callout callout-gold">
+      <div class="callout-title">The Selena Gomez Moment</div>
+      <p>The ultimate vision: one LaScala game running live. Thousands of people watching and betting on the outcome in real time. Odds shifting on every throw. The crowd visible in the sentiment bar. Players hedging mid-game. Cards being earned and traded. That is a product. That is a business. This is version one of it.</p>
+    </div>
+  </div>
+</div>
+
+<footer>LASCALA LIVE · © 2025 MATCHLESS GAMES LIMITED · ALL RIGHTS RESERVED</footer>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

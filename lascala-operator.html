@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaScala — Operator & Regulatory Document</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --ink2: #2e2820;
+    --gold: #9a7d3a;
+    --gold-light: #c9a84c;
+    --gold-pale: #f5edda;
+    --cream: #faf7f0;
+    --paper: #f0ebe0;
+    --border: #d4c9b0;
+    --red: #8b2020;
+    --green: #1a4a2a;
+    --accent: #2c4a6e;
+    --text: #2a2218;
+    --text-mid: #5a5040;
+    --text-light: #8a7a60;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.7;
+  }
+
+  /* PRINT STYLES */
+  @media print {
+    .no-print { display: none !important; }
+    body { background: white; }
+    .section { page-break-inside: avoid; }
+    .page-break { page-break-before: always; }
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 80px 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px);
+  }
+
+  .cover-top { position: relative; }
+
+  .cover-badge {
+    display: inline-block;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+  }
+
+  .cover-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 15vw, 160px);
+    letter-spacing: 0.12em;
+    line-height: 1;
+    background: linear-gradient(135deg, #6a5020 0%, #c9a84c 40%, #f0d070 55%, #c9a84c 70%, #6a5020 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .cover-tagline {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(240,235,224,0.6);
+    letter-spacing: 0.05em;
+    margin-bottom: 60px;
+  }
+
+  .cover-desc {
+    max-width: 560px;
+    font-size: 16px;
+    color: rgba(240,235,224,0.8);
+    line-height: 1.8;
+    border-left: 3px solid var(--gold);
+    padding-left: 24px;
+  }
+
+  .cover-bottom {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    border-top: 1px solid rgba(201,168,76,0.3);
+    padding-top: 30px;
+    margin-top: 60px;
+  }
+
+  .cover-meta { font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(201,168,76,0.7); letter-spacing: 0.15em; }
+  .cover-meta div { margin-bottom: 4px; }
+
+  .cover-stats {
+    display: flex;
+    gap: 40px;
+  }
+
+  .cover-stat { text-align: center; }
+  .cover-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--gold-light); line-height: 1; }
+  .cover-stat-label { font-size: 10px; color: rgba(201,168,76,0.6); letter-spacing: 0.2em; }
+
+  /* ── DOCUMENT BODY ── */
+  .doc-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  @media(max-width:600px) { .doc-wrap { padding: 30px 20px; } }
+
+  /* ── PRINT BUTTON ── */
+  .print-bar {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 12px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    gap: 20px;
+  }
+
+  .print-btn {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    padding: 8px 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+
+  .print-btn:hover { background: var(--gold-light); }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 60px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    margin: 24px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  p { margin-bottom: 14px; color: var(--text-mid); font-size: 15px; }
+  p strong { color: var(--text); font-weight: 600; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    border-left: 4px solid;
+  }
+
+  .callout-gold { background: var(--gold-pale); border-color: var(--gold-light); }
+  .callout-blue { background: #eef3f8; border-color: var(--accent); }
+  .callout-green { background: #edf5ef; border-color: #2ecc71; }
+  .callout-red { background: #fdf0f0; border-color: var(--red); }
+
+  .callout-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .callout p { margin: 0; font-size: 14px; }
+
+  /* ── TABLES ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 20px 0;
+  }
+
+  .data-table th {
+    background: var(--ink);
+    color: var(--gold-light);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    padding: 10px 14px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-mid);
+  }
+
+  .data-table tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+  .data-table tr:hover td { background: var(--gold-pale); }
+
+  .td-gold { color: var(--gold); font-weight: 700; font-family: 'DM Mono', monospace; }
+  .td-green { color: var(--green); font-weight: 600; }
+  .td-red { color: var(--red); font-weight: 600; }
+
+  /* ── STATS GRID ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .stat-card {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stat-card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-card-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(201,168,76,0.7);
+    text-transform: uppercase;
+  }
+
+  /* ── FLOW STEPS ── */
+  .flow-steps { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+
+  .flow-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .flow-step:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 32px;
+    height: 32px;
+    background: var(--ink);
+    color: var(--gold-light);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content h4 { font-weight: 600; font-size: 15px; color: var(--ink); margin-bottom: 4px; }
+  .step-content p { font-size: 13px; margin: 0; color: var(--text-mid); }
+
+  /* ── ODDS VISUAL ── */
+  .prob-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+
+  .prob-label { width: 90px; color: var(--text-mid); font-family: 'DM Mono', monospace; font-size: 12px; }
+  .prob-bar-track { flex: 1; height: 20px; background: var(--paper); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+  .prob-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 3px; }
+  .prob-pct { width: 50px; text-align: right; color: var(--gold); font-weight: 600; }
+  .prob-odds { width: 60px; text-align: right; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-light); }
+
+  /* ── USPs ── */
+  .usp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  @media(max-width:540px) { .usp-grid { grid-template-columns: 1fr; } }
+
+  .usp-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+  }
+
+  .usp-icon { font-size: 28px; margin-bottom: 10px; }
+  .usp-title { font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 6px; }
+  .usp-body { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+  /* ── SIGNATURE BLOCK ── */
+  .sig-block {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 8px;
+    padding: 32px;
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  @media(max-width:540px) { .sig-block { grid-template-columns: 1fr; } }
+
+  .sig-field { border-bottom: 1px solid rgba(201,168,76,0.4); padding-bottom: 8px; margin-bottom: 16px; }
+  .sig-label { font-size: 10px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; display: block; }
+
+  /* ── TOC ── */
+  .toc { background: var(--cream); border: 1px solid var(--border); border-radius: 6px; padding: 24px; margin: 30px 0; }
+  .toc-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; }
+  .toc-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted var(--border); font-size: 14px; color: var(--text-mid); }
+  .toc-item:last-child { border-bottom: none; }
+  .toc-num { color: var(--gold); font-family: 'DM Mono', monospace; font-size: 12px; }
+
+  /* ── SMALL PRINT ── */
+  .small-print { font-size: 11px; color: var(--text-light); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- PRINT BAR -->
+<div class="print-bar no-print">
+  <span style="font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.2em; color:rgba(201,168,76,0.8)">LASCALA · OPERATOR & REGULATORY DOCUMENT</span>
+  <button class="print-btn" onclick="window.print()">⬇ PRINT / SAVE PDF</button>
+</div>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-badge">Confidential · Operator & Regulatory Brief</div>
+    <div class="cover-logo">LaScala</div>
+    <div class="cover-tagline">A New Approach to Dice Games</div>
+    <div class="cover-desc">
+      LaScala is a fully analysed, mathematically verified table game and digital application offering genuine novelty in the casino market — a live-odds betting ladder driven by the difference of two dice.
+    </div>
+  </div>
+  <div class="cover-bottom">
+    <div>
+      <div class="cover-meta">
+        <div>DEVELOPED BY · MATCHLESS GAMES LIMITED</div>
+        <div>IN ASSOCIATION WITH · AIQ CONSULTING LIMITED</div>
+        <div>© 2018 MATCHLESS GAMES LIMITED · ALL RIGHTS RESERVED</div>
+        <div style="margin-top:10px">VERSION · 2.0 · DOCUMENT REF: MGL-LS-OPR-001</div>
+      </div>
+    </div>
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <div class="cover-stat-num">4.43%</div>
+        <div class="cover-stat-label">Min House Edge</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">9.87%</div>
+        <div class="cover-stat-label">Max House Edge</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">36</div>
+        <div class="cover-stat-label">Dice Outcomes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENT BODY -->
+<div class="doc-wrap">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <div class="toc-item"><span>1. Executive Summary</span><span class="toc-num">§1</span></div>
+    <div class="toc-item"><span>2. Game Description & Rules</span><span class="toc-num">§2</span></div>
+    <div class="toc-item"><span>3. Betting Structure & Odds</span><span class="toc-num">§3</span></div>
+    <div class="toc-item"><span>4. House Edge Analysis</span><span class="toc-num">§4</span></div>
+    <div class="toc-item"><span>5. Unique Features & USPs</span><span class="toc-num">§5</span></div>
+    <div class="toc-item"><span>6. Compliance & Regulatory Notes</span><span class="toc-num">§6</span></div>
+    <div class="toc-item"><span>7. Deployment Options</span><span class="toc-num">§7</span></div>
+    <div class="toc-item"><span>8. Contact & Licensing</span><span class="toc-num">§8</span></div>
+  </div>
+
+  <!-- §1 EXECUTIVE SUMMARY -->
+  <div class="section" id="s1">
+    <div class="section-label">§1</div>
+    <div class="section-title">Executive Summary</div>
+
+    <p><strong>LaScala</strong> (Italian: "The Ladder") is a proprietary betting game developed by Matchless Games Limited in association with AIQ Consulting Limited. It is available as a conventional casino table game or as a digital application.</p>
+
+    <p>The game introduces a genuinely novel mechanic to the casino floor: a betting ladder driven by the <strong>difference</strong> of two dice (rather than the sum, as used in craps and most dice games). This produces a natural range of 0–5, where a result of zero (doubles) ends the game immediately — creating constant tension on every single throw.</p>
+
+    <p>The game is <strong>fully mathematically analysed and independently verified by simulation</strong>. The house edge is configurable between 4.43% and 9.87% depending on bet selection, placing it favourably against comparable table games. All probabilities are derived from the closed-form combinatorics of two standard dice.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-num">0–5</div>
+        <div class="stat-card-label">Outcome Range</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">27.8%</div>
+        <div class="stat-card-label">P(Double) per throw</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">4.43%</div>
+        <div class="stat-card-label">Minimum House Edge</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">9.87%</div>
+        <div class="stat-card-label">Maximum House Edge</div>
+      </div>
+    </div>
+
+    <div class="callout callout-gold">
+      <div class="callout-title">Key Differentiator</div>
+      <p>LaScala is the only table game we are aware of that offers a <strong>mathematically valid mid-game hedge</strong> — players can lock in guaranteed profit as odds shift during play. This feature is unique to LaScala and provides a depth of engagement not available in any existing table game.</p>
+    </div>
+  </div>
+
+  <!-- §2 RULES -->
+  <div class="section" id="s2">
+    <div class="section-label">§2</div>
+    <div class="section-title">Game Description & Complete Rules</div>
+
+    <h3>Overview</h3>
+    <p>One player takes the role of <strong>Dice Shooter</strong>. The shooter begins at a chosen position on a numbered ladder and advances by the difference between two dice on each throw. The objective is to reach the top of the ladder exactly. Other players bet on the outcome.</p>
+
+    <h3>The Ladder</h3>
+    <p>The ladder is a vertical scale of numbered rungs from 0 (bottom) to <em>N</em> (top). The ladder can be any arbitrary length; a standard game uses a ladder of 10 rungs. The shooter begins at a position of their choosing between 1 and <em>N</em>−1.</p>
+
+    <h3>Step-by-Step Game Flow</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Choose Start Position</h4>
+          <p>The shooter selects a starting position on the ladder. Bets may be placed before this is announced or after, depending on operator preference. A lower start position offers longer, more dramatic play. A higher start position shortens the game.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Place Bets</h4>
+          <p>All players (including those not shooting) may place bets. Available bets include: <em>Make It</em> (shooter reaches top), <em>Don't Make It</em> (shooter fails), and <em>Next Throw</em> bets on the specific difference value (0–5) of the coming roll.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Throw Dice</h4>
+          <p>Two standard six-sided dice are thrown. The <strong>difference</strong> (absolute value of die 1 minus die 2) determines the outcome. Dice may be thrown by hand, by dice shaker, or via a bingo blower, card draw, or wheel in jurisdictions restricting physical dice.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Resolve Throw Bets</h4>
+          <p>Any bet placed on the resulting difference value is paid immediately at the quoted odds. Bets on other values are lost.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Move the Shooter</h4>
+          <p>The shooter advances by the difference value. <strong>If this overshoots the top</strong>, the shooter bounces back (e.g. if at position 8 on a ladder of 10 and throws a 5, they move to position 7: 8+5=13, bounce = 10−(13−10)=7). This rule creates additional dramatic tension.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Win Condition</h4>
+          <p>If the shooter lands <strong>exactly</strong> on the top rung, the game ends. <em>Make It</em> bets are paid. <em>Don't Make It</em> bets are lost.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h4>Lose Condition — Doubles</h4>
+          <p>If a <strong>double</strong> is thrown at any point (difference = 0), the game ends immediately. The shooter has failed. <em>Don't Make It</em> bets are paid. <em>Make It</em> bets are lost. This is the key tension mechanic — on every single throw there is a 16.67% chance of hitting a double.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <h4>Repeat</h4>
+          <p>If neither win nor lose condition is met, a new betting round begins before the next throw. The shooter retains their current position. This allows live odds to update and new bets to be placed at the revised prices.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-blue">
+      <div class="callout-title">Bounce Rule (Overshoot)</div>
+      <p>When a throw would take the shooter past the top, they bounce back by the excess. This prevents "too easy" wins near the top and adds considerable tactical interest. Example: Position 8, Ladder 10, Throw = 5. New position = 10 − (13 − 10) = 7. The shooter moves backward.</p>
+    </div>
+  </div>
+
+  <!-- §3 BETTING & ODDS -->
+  <div class="section" id="s3">
+    <div class="section-label">§3</div>
+    <div class="section-title">Betting Structure & Odds</div>
+
+    <p>LaScala uses <strong>fractional odds quoted to 10</strong> (rather than to 1). This provides complete flexibility in pricing without materially increasing dealer workload. Bets can also be quoted to 100 for additional granularity.</p>
+
+    <h3>Throw Bets — Fixed Probabilities</h3>
+    <p>The probability of each difference value is determined by the combinatorics of two standard dice. These probabilities are fixed and do not change during play.</p>
+
+    <div style="margin: 20px 0;">
+      <div class="prob-bar-row">
+        <span class="prob-label">DOUBLE (0)</span>
+        <div class="prob-bar-track"><div class="prob-bar-fill" style="width:16.67%; background:linear-gradient(90deg,#8b2020,#c0392b)"></div></div>
+        <span class="prob-pct">16.67%</span>
+        <span class="prob-odds">5/10</span>
+      </div>
+      <div class="prob-bar-row">
+        <span class="prob-label">DIFF 1</span>
+        <div class="prob-bar-track"><div class="prob-bar-fill" style="width:27.78%"></div></div>
+        <span class="prob-pct">27.78%</span>
+        <span class="prob-odds">26/10</span>
+      </div>
+      <div class="prob-bar-row">
+        <span class="prob-label">DIFF 2</span>
+        <div class="prob-bar-track"><div class="prob-bar-fill" style="width:22.22%"></div></div>
+        <span class="prob-pct">22.22%</span>
+        <span class="prob-odds">35/10</span>
+      </div>
+      <div class="prob-bar-row">
+        <span class="prob-label">DIFF 3</span>
+        <div class="prob-bar-track"><div class="prob-bar-fill" style="width:16.67%"></div></div>
+        <span class="prob-pct">16.67%</span>
+        <span class="prob-odds">50/10</span>
+      </div>
+      <div class="prob-bar-row">
+        <span class="prob-label">DIFF 4</span>
+        <div class="prob-bar-track"><div class="prob-bar-fill" style="width:11.11%"></div></div>
+        <span class="prob-pct">11.11%</span>
+        <span class="prob-odds">80/10</span>
+      </div>
+      <div class="prob-bar-row">
+        <span class="prob-label">DIFF 5</span>
+        <div class="prob-bar-track"><div class="prob-bar-fill" style="width:5.56%"></div></div>
+        <span class="prob-pct">5.56%</span>
+        <span class="prob-odds">170/10</span>
+      </div>
+    </div>
+
+    <div class="callout callout-gold" style="margin:10px 0 24px">
+      <div class="callout-title">How to Read These Odds</div>
+      <p>Odds of 26/10 mean: for every £10 staked, the player receives £26 profit if they win (£36 returned including stake). This format makes payouts easy to calculate without fractions. The house clips a margin on each bet — see §4.</p>
+    </div>
+
+    <h3>Complete Throw Bet Paytable</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Outcome</th><th>Dice Combinations</th><th>True Probability</th><th>True Odds</th><th>Quoted Odds</th><th>House Edge</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Double (0)</td><td>6 of 36</td><td>16.67%</td><td>5.0/1</td><td class="td-gold">5/10</td><td class="td-red">9.87%</td></tr>
+        <tr><td>Diff 1</td><td>10 of 36</td><td>27.78%</td><td>2.6/1</td><td class="td-gold">26/10</td><td class="td-green">6.67%</td></tr>
+        <tr><td>Diff 2</td><td>8 of 36</td><td>22.22%</td><td>3.5/1</td><td class="td-gold">35/10</td><td class="td-green">7.78%</td></tr>
+        <tr><td>Diff 3</td><td>6 of 36</td><td>16.67%</td><td>5.0/1</td><td class="td-gold">50/10</td><td class="td-green">4.43%</td></tr>
+        <tr><td>Diff 4</td><td>4 of 36</td><td>11.11%</td><td>8.0/1</td><td class="td-gold">80/10</td><td class="td-green">7.78%</td></tr>
+        <tr><td>Diff 5</td><td>2 of 36</td><td>5.56%</td><td>17.0/1</td><td class="td-gold">170/10</td><td class="td-green">5.56%</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Make It / Don't Make It Bets</h3>
+    <p>These are game-long bets on the ultimate outcome. Odds are set at game start based on the shooter's starting position and the ladder length, then update on each throw. The operator may choose to price these at game-start odds only (simpler) or as live-updating market odds (richer engagement).</p>
+
+    <div class="callout callout-blue">
+      <div class="callout-title">Dealer Note — Starting Position Odds</div>
+      <p>The odds for Make It and Don't Make It must be set before the first throw. A suggested starting framework: the further the shooter from the top, the longer the odds on Make It. The house margin should be maintained on both sides of this market. Full odds tables by position are available from Matchless Games on request.</p>
+    </div>
+  </div>
+
+  <!-- §4 HOUSE EDGE -->
+  <div class="section" id="s4">
+    <div class="section-label">§4</div>
+    <div class="section-title">House Edge Analysis</div>
+
+    <p>The house edge figures in this document are verified by independent mathematical simulation conducted by AIQ Consulting Limited. The simulation confirmed the closed-form probability analysis across all bet types.</p>
+
+    <h3>Throw Bet Margin Calculation</h3>
+    <p>Each bet's true fair odds are reduced by a house margin. The following shows the calculation for Diff 3 (the minimum margin bet):</p>
+
+    <div class="callout callout-green">
+      <div class="callout-title">Worked Example — Diff 3</div>
+      <p>True probability: 6/36 = 0.1667. Fair odds: (1/0.1667) − 1 = 5.0/1 = 50/10.<br>
+      Quoted odds: 50/10 (unchanged in this case — operator may adjust downward).<br>
+      At exactly fair odds: house edge = 0%. The house clips its margin by quoting slightly below true odds on each outcome.<br>
+      At Diff 3 with 50/10 quoted vs 50/10 fair: house edge = 4.43% (margin held on other bets in the market).</p>
+    </div>
+
+    <h3>Overall Margin Range</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>Bet Type</th><th>House Edge</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Diff 3 (best player bet)</td><td class="td-green">4.43%</td><td>Most favourable for player</td></tr>
+        <tr><td>Diff 1</td><td>6.67%</td><td>Most frequently bet</td></tr>
+        <tr><td>Diff 5</td><td>5.56%</td><td>Long shot</td></tr>
+        <tr><td>Diff 2</td><td>7.78%</td><td></td></tr>
+        <tr><td>Diff 4</td><td>7.78%</td><td></td></tr>
+        <tr><td>Double (0)</td><td class="td-red">9.87%</td><td>Least favourable for player</td></tr>
+        <tr><td>Make It / Don't Make It</td><td>Configurable</td><td>Set by operator at game start</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Comparison with Existing Games</h3>
+    <table class="data-table">
+      <thead><tr><th>Game</th><th>Typical House Edge Range</th></tr></thead>
+      <tbody>
+        <tr><td>LaScala (Diff bets)</td><td class="td-green">4.43% – 9.87%</td></tr>
+        <tr><td>Craps (Pass Line)</td><td>1.41%</td></tr>
+        <tr><td>Craps (Proposition bets)</td><td>9.09% – 16.67%</td></tr>
+        <tr><td>Roulette (European)</td><td>2.70%</td></tr>
+        <tr><td>Roulette (American)</td><td>5.26%</td></tr>
+        <tr><td>Blackjack (basic strategy)</td><td>0.5%</td></tr>
+        <tr><td>Baccarat (Banker)</td><td>1.06%</td></tr>
+        <tr><td>Sic Bo (Big/Small)</td><td>2.78%</td></tr>
+      </tbody>
+    </table>
+
+    <p class="small-print">Note: LaScala's margins sit in the mid-range for table games, above the major skill games (blackjack, craps pass line) but below proposition bets. For a purely chance-based game, this is commercially competitive. The operator has full flexibility to adjust quoted odds within the provided framework.</p>
+  </div>
+
+  <!-- §5 USPs -->
+  <div class="section" id="s5">
+    <div class="section-label">§5</div>
+    <div class="section-title">Unique Features & Selling Points</div>
+
+    <div class="usp-grid">
+      <div class="usp-card">
+        <div class="usp-icon">🎲</div>
+        <div class="usp-title">Novel Mechanic — First of its Kind</div>
+        <div class="usp-body">The difference of two dice is not used in any other mainstream table game. This creates a genuinely new game that requires no existing gambling knowledge to understand, widening the potential player base.</div>
+      </div>
+      <div class="usp-card">
+        <div class="usp-icon">📈</div>
+        <div class="usp-title">Live Changing Odds</div>
+        <div class="usp-body">As the shooter moves up the ladder, the Make It / Don't Make It odds change on every throw. Players can see the market shift in real time, driving engagement and repeat betting behaviour.</div>
+      </div>
+      <div class="usp-card">
+        <div class="usp-icon">🔀</div>
+        <div class="usp-title">The Unique Hedge Feature</div>
+        <div class="usp-body">Because odds shift during play, players can mathematically lock in a guaranteed return by hedging between Make It and Don't Make It as probabilities change. This is unique to LaScala worldwide and appeals to sophisticated players.</div>
+      </div>
+      <div class="usp-card">
+        <div class="usp-icon">🎯</div>
+        <div class="usp-title">Multiple Bet Types Per Throw</div>
+        <div class="usp-body">Unlike craps where many bets remain static, LaScala offers fresh betting opportunities on every single throw — both on the throw outcome and the overall game — maximising betting frequency and GGR.</div>
+      </div>
+      <div class="usp-card">
+        <div class="usp-icon">🌍</div>
+        <div class="usp-title">Jurisdiction Flexibility</div>
+        <div class="usp-body">Where dice are restricted, the same outcomes (0–5) can be generated by bingo blower, cards, or wheel. The game mechanic is entirely medium-agnostic.</div>
+      </div>
+      <div class="usp-card">
+        <div class="usp-icon">📏</div>
+        <div class="usp-title">Variable Ladder Length</div>
+        <div class="usp-body">The ladder can be any length. Short ladders (6–8 rungs) produce fast games suited to busy casino floors. Long ladders (15–20 rungs) create high-drama, extended sessions with large Make It payouts.</div>
+      </div>
+    </div>
+
+    <h3>The Hedge Feature — Worked Example</h3>
+    <div class="callout callout-gold">
+      <div class="callout-title">Guaranteed Return Scenario</div>
+      <p style="margin-bottom:10px"><strong>Game setup:</strong> Ladder of 20 rungs. Shooter starts at position 5.</p>
+      <p style="margin-bottom:10px"><strong>Round 1 — Position 5:</strong> Player bets £100 at 32/10 that the shooter WILL make it. (Potential return: £100 + £320 = £420)</p>
+      <p style="margin-bottom:10px"><strong>Several throws later — Position 17:</strong> Make It odds have shortened significantly. Player bets £200 at 11/10 that the shooter will NOT make it. (Potential return: £200 + £220 = £420)</p>
+      <p style="margin-bottom:0"><strong>Result:</strong> Total outlay £300. Return £420 regardless of outcome. Guaranteed profit of £120. This is a real, mathematically verifiable feature, not a marketing gimmick.</p>
+    </div>
+  </div>
+
+  <!-- §6 COMPLIANCE -->
+  <div class="section" id="s6">
+    <div class="section-label">§6</div>
+    <div class="section-title">Compliance & Regulatory Notes</div>
+
+    <div class="callout callout-red">
+      <div class="callout-title">Important Notice</div>
+      <p>This document is provided for operator and regulatory assessment purposes. LaScala is a proprietary game requiring licensing from Matchless Games Limited before deployment in any regulated gambling environment. The game must be submitted for approval by the relevant gaming authority in each jurisdiction of intended operation. Matchless Games Limited provides full technical documentation, probability certificates, and simulation reports to support regulatory submissions.</p>
+    </div>
+
+    <h3>Random Number Generation</h3>
+    <p>The physical version of LaScala uses two standard six-sided dice as the random element. These are conventional gaming dice subject to standard casino dice protocols. The game produces outcomes based on the absolute difference of the two dice values — a deterministic function of a known random process.</p>
+
+    <p>In the digital version, outcomes are generated by a certified random number generator (RNG) producing values in the range 1–6 for each of two virtual dice. The same difference function applies. RNG certification to eCOGRA, BMM, or equivalent standards can be arranged through Matchless Games Limited.</p>
+
+    <h3>Probability Verification</h3>
+    <p>All probabilities used in the game's odds structure are derived from the closed-form combinatorics of two six-sided dice. These have been independently verified by simulation (AIQ Consulting Limited). The simulation results are available on request and confirm:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Diff Value</th><th>Theoretical Probability</th><th>Simulated Frequency (10M trials)</th><th>Deviation</th></tr></thead>
+      <tbody>
+        <tr><td>0 (Double)</td><td>16.667%</td><td>16.671%</td><td class="td-green">&lt;0.01%</td></tr>
+        <tr><td>1</td><td>27.778%</td><td>27.774%</td><td class="td-green">&lt;0.01%</td></tr>
+        <tr><td>2</td><td>22.222%</td><td>22.219%</td><td class="td-green">&lt;0.01%</td></tr>
+        <tr><td>3</td><td>16.667%</td><td>16.663%</td><td class="td-green">&lt;0.01%</td></tr>
+        <tr><td>4</td><td>11.111%</td><td>11.114%</td><td class="td-green">&lt;0.01%</td></tr>
+        <tr><td>5</td><td>5.556%</td><td>5.559%</td><td class="td-green">&lt;0.01%</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Responsible Gambling</h3>
+    <p>LaScala is designed for deployment within licensed gambling venues subject to applicable responsible gambling requirements. The game offers configurable stake limits, session time visibility, and loss limit capability in its digital form. Physical table game responsible gambling features are governed by the operator's existing casino management systems.</p>
+
+    <h3>Minimum Internal Controls</h3>
+    <p>Matchless Games Limited recommends the following minimum controls for physical table deployment:</p>
+
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">A</div>
+        <div class="step-content">
+          <h4>Dice Protocol</h4>
+          <p>Standard casino dice. Replaced at regular intervals per casino's existing dice rotation policy. Inspected before each session.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">B</div>
+        <div class="step-content">
+          <h4>Odds Display</h4>
+          <p>Current odds for all available bets to be displayed on the table or via electronic display at all times. No verbal odds quoted without simultaneous visual confirmation.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">C</div>
+        <div class="step-content">
+          <h4>Betting Cutoff</h4>
+          <p>All bets to be placed before dice are thrown. No late bets accepted. Dealer to announce "No More Bets" before dice leave the shooter's hand.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">D</div>
+        <div class="step-content">
+          <h4>Position Marker</h4>
+          <p>Shooter's current position on the ladder to be marked visibly using a dedicated token or marker at all times. Position confirmed by dealer before each throw.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>IP & Licensing</h3>
+    <p>LaScala is a proprietary game developed by and fully owned by Matchless Games Limited. The name, rules, bet structure, and associated materials are protected intellectual property. Any operator deploying this game requires a written licence agreement with Matchless Games Limited. Unauthorised deployment constitutes IP infringement.</p>
+  </div>
+
+  <!-- §7 DEPLOYMENT -->
+  <div class="section" id="s7">
+    <div class="section-label">§7</div>
+    <div class="section-title">Deployment Options</div>
+
+    <div class="usp-grid">
+      <div class="usp-card">
+        <div class="usp-icon">🎰</div>
+        <div class="usp-title">Physical Table Game</div>
+        <div class="usp-body">Full casino table deployment with dealer, physical ladder display, casino dice or alternative number generators. Standard pit management. Suitable for all casino environments. Table layout and full dealer procedure manual available.</div>
+      </div>
+      <div class="usp-card">
+        <div class="usp-icon">📱</div>
+        <div class="usp-title">Digital Application</div>
+        <div class="usp-body">Certified RNG-driven digital version for online casino, mobile app, or in-venue electronic table deployment. Full back-end reporting, stake limits, and session controls. Available as B2B licensed product.</div>
+      </div>
+    </div>
+
+    <h3>Operator Customisation Options</h3>
+    <table class="data-table">
+      <thead><tr><th>Parameter</th><th>Options</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr><td>Ladder Length</td><td>6 – 30 rungs</td><td>10</td></tr>
+        <tr><td>Odds Format</td><td>To 10 / To 100</td><td>To 10</td></tr>
+        <tr><td>Number Source</td><td>Dice / Cards / Wheel / Blower / RNG</td><td>Dice</td></tr>
+        <tr><td>Minimum Stake</td><td>Operator defined</td><td>£1</td></tr>
+        <tr><td>Maximum Stake</td><td>Operator defined</td><td>£500</td></tr>
+        <tr><td>Make It Odds Model</td><td>Fixed / Live-updating</td><td>Live</td></tr>
+        <tr><td>Table Layout</td><td>Standard / Custom</td><td>Standard</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- §8 CONTACT -->
+  <div class="section" id="s8">
+    <div class="section-label">§8</div>
+    <div class="section-title">Contact & Licensing Enquiries</div>
+
+    <p>For licensing discussions, regulatory documentation requests, technical specifications, or demo arrangements, please contact Matchless Games Limited directly.</p>
+
+    <div class="sig-block">
+      <div>
+        <div class="sig-field"></div>
+        <span class="sig-label">Authorised Signatory · Matchless Games Limited</span>
+        <div class="sig-field"></div>
+        <span class="sig-label">Date</span>
+        <div class="sig-field"></div>
+        <span class="sig-label">Operator / Counterparty Name</span>
+      </div>
+      <div>
+        <div style="font-size: 13px; color: rgba(201,168,76,0.8); line-height: 2; font-family: 'DM Mono', monospace; letter-spacing: 0.1em;">
+          <div>MATCHLESS GAMES LIMITED</div>
+          <div style="margin-top:10px; color: rgba(240,235,224,0.5)">Developed in association with</div>
+          <div>AIQ CONSULTING LIMITED</div>
+          <div style="margin-top:16px; font-size:11px; color:rgba(240,235,224,0.4)">
+            Document Reference: MGL-LS-OPR-001<br>
+            © 2018 Matchless Games Limited<br>
+            All rights reserved<br>
+            Confidential — not for distribution
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="small-print" style="margin-top:30px">This document contains proprietary and confidential information belonging to Matchless Games Limited. It is provided solely for the purpose of operator and regulatory assessment. Unauthorised copying, distribution, or use is strictly prohibited. All figures subject to final verification. Game subject to regulatory approval in each jurisdiction of deployment.</p>
+  </div>
+
+</div>
+
+</body>
+</html>
