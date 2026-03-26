@@ -1198,15 +1198,14 @@ function renderBetGrid() {
   const makeOdds = probToOdds(makeProb);
   const dontOdds = probToOdds(dontProb);
 
-  // Throw bets (0–5)
+  // Throw bets — exact quoted odds at 5% target margin (AIQ Consulting Ltd verified)
+  const QUOTED_ODDS = {0: 47, 1: 24, 2: 33, 3: 47, 4: 75, 5: 161};
   const bets = [
     { key:'make', name:'MAKE IT', sub:'Shooter reaches top', odds: makeOdds },
     { key:'dont', name:"DON'T MAKE IT", sub:'Shooter fails', odds: dontOdds },
   ];
   for (let d = 0; d <= 5; d++) {
-    const prob = DIFF_PROBS[d];
-    const odds = probToOdds(prob);
-    bets.push({ key:'diff_'+d, name: d === 0 ? 'DOUBLE (0)' : 'DIFF ' + d, sub: d === 0 ? 'Game ends!' : 'Next throw = ' + d, odds });
+    bets.push({ key:'diff_'+d, name: d === 0 ? 'DOUBLE (0)' : 'DIFF ' + d, sub: d === 0 ? 'Game ends!' : 'Next throw = ' + d, odds: QUOTED_ODDS[d] });
   }
 
   container.innerHTML = '';
@@ -1258,8 +1257,12 @@ function renderBetDisplay() {
 function renderStatus() {
   const el = document.getElementById('status-text');
   const shooter = G.players[G.shooter];
+  const zones = {1:'ZONE',2:'ZONE',3:'ZONE',4:'ZONE',5:'ZONE',6:'SHORT',7:'SHORT',8:'SHORT',9:'CLASSIC',10:'CLASSIC',11:'CLASSIC',12:'LONG',13:'LONG',14:'LONG'};
+  const remaining = G.ladderSize - G.pos;
+  const zone = zones[remaining] || 'EPIC';
+  const zoneColors = {ZONE:'var(--red)',SHORT:'#f39c12',CLASSIC:'var(--green)',LONG:'var(--blue)',EPIC:'#9b59b6'};
   if (G.phase === 'betting') {
-    el.innerHTML = `<span class="text-gold">${shooter.name}</span> is shooting.<br>Position: <strong>${G.pos}</strong> → Top: <strong>${G.ladderSize}</strong><br>Needs exactly <strong>${G.ladderSize - G.pos}</strong> more to win.`;
+    el.innerHTML = `<span class="text-gold">${shooter.name}</span> is shooting.<br>Steps to top: <strong>${remaining}</strong> &nbsp;<span style="color:${zoneColors[zone]};font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.15em">[${zone}]</span><br>Position: <strong>${G.pos}</strong> of <strong>${G.ladderSize}</strong>`;
   } else if (G.phase === 'throwing') {
     el.innerHTML = `Bets locked. <span class="text-gold">${shooter.name}</span> throws!`;
   }
@@ -1446,13 +1449,34 @@ function probToOdds(prob) {
 }
 
 function calcMakeProb(pos, top) {
-  // Simplified: estimate via simulation data
+  // Exact probabilities verified by AIQ Consulting Limited (10M trial simulation)
+  // Counting from top: position = steps remaining to win
   const remaining = top - pos;
   if (remaining <= 0) return 1;
-  if (remaining > top) return 0.05;
-  // Monte Carlo approximation stored as lookup
-  const probs = {1:0.278,2:0.278,3:0.278,4:0.306,5:0.278,6:0.278,7:0.25,8:0.222,9:0.194,10:0.167,11:0.139,12:0.111,13:0.083,14:0.056,15:0.028};
-  return probs[remaining] || Math.max(0.02, (top - remaining) / top * 0.3);
+  const probs = {
+      1: 0.600846,
+      2: 0.585556,
+      3: 0.562134,
+      4: 0.530904,
+      5: 0.492301,
+      6: 0.446860,
+      7: 0.417002,
+      8: 0.387405,
+      9: 0.358951,
+      10: 0.332300,
+      11: 0.307799,
+      12: 0.285381,
+      13: 0.264462,
+      14: 0.245044,
+      15: 0.227062,
+      16: 0.210413,
+      17: 0.194986,
+      18: 0.180684,
+      19: 0.167432,
+      20: 0.155152
+    };
+  // For positions beyond 20, use verified decay formula
+  return probs[remaining] || Math.max(0.02, 0.155152 * Math.pow(0.927, remaining - 20));
 }
 
 function addLog(msg, type) {

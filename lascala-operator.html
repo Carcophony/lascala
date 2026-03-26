@@ -412,12 +412,12 @@
     </div>
     <div class="cover-stats">
       <div class="cover-stat">
-        <div class="cover-stat-num">4.43%</div>
-        <div class="cover-stat-label">Min House Edge</div>
+        <div class="cover-stat-num">~5%</div>
+        <div class="cover-stat-label">Target House Edge</div>
       </div>
       <div class="cover-stat">
-        <div class="cover-stat-num">9.87%</div>
-        <div class="cover-stat-label">Max House Edge</div>
+        <div class="cover-stat-num">4–6%</div>
+        <div class="cover-stat-label">Actual Range</div>
       </div>
       <div class="cover-stat">
         <div class="cover-stat-num">36</div>
@@ -616,17 +616,49 @@
         <tr><th>Outcome</th><th>Dice Combinations</th><th>True Probability</th><th>True Odds</th><th>Quoted Odds</th><th>House Edge</th></tr>
       </thead>
       <tbody>
-        <tr><td>Double (0)</td><td>6 of 36</td><td>16.67%</td><td>5.0/1</td><td class="td-gold">5/10</td><td class="td-red">9.87%</td></tr>
-        <tr><td>Diff 1</td><td>10 of 36</td><td>27.78%</td><td>2.6/1</td><td class="td-gold">26/10</td><td class="td-green">6.67%</td></tr>
-        <tr><td>Diff 2</td><td>8 of 36</td><td>22.22%</td><td>3.5/1</td><td class="td-gold">35/10</td><td class="td-green">7.78%</td></tr>
-        <tr><td>Diff 3</td><td>6 of 36</td><td>16.67%</td><td>5.0/1</td><td class="td-gold">50/10</td><td class="td-green">4.43%</td></tr>
-        <tr><td>Diff 4</td><td>4 of 36</td><td>11.11%</td><td>8.0/1</td><td class="td-gold">80/10</td><td class="td-green">7.78%</td></tr>
-        <tr><td>Diff 5</td><td>2 of 36</td><td>5.56%</td><td>17.0/1</td><td class="td-gold">170/10</td><td class="td-green">5.56%</td></tr>
+        <tr><td>Double (0)</td><td>6 of 36</td><td>16.67%</td><td>5.0/1</td><td class="td-gold">47/10</td><td class="td-green">5.00%</td></tr>
+        <tr><td>Diff 1</td><td>10 of 36</td><td>27.78%</td><td>2.6/1</td><td class="td-gold">24/10</td><td class="td-green">5.56%</td></tr>
+        <tr><td>Diff 2</td><td>8 of 36</td><td>22.22%</td><td>3.5/1</td><td class="td-gold">33/10</td><td class="td-green">4.44%</td></tr>
+        <tr><td>Diff 3</td><td>6 of 36</td><td>16.67%</td><td>5.0/1</td><td class="td-gold">47/10</td><td class="td-green">5.00%</td></tr>
+        <tr><td>Diff 4</td><td>4 of 36</td><td>11.11%</td><td>8.0/1</td><td class="td-gold">75/10</td><td class="td-green">5.56%</td></tr>
+        <tr><td>Diff 5</td><td>2 of 36</td><td>5.56%</td><td>17.0/1</td><td class="td-gold">161/10</td><td class="td-green">5.00%</td></tr>
       </tbody>
     </table>
 
     <h3>Make It / Don't Make It Bets</h3>
     <p>These are game-long bets on the ultimate outcome. Odds are set at game start based on the shooter's starting position and the ladder length, then update on each throw. The operator may choose to price these at game-start odds only (simpler) or as live-updating market odds (richer engagement).</p>
+
+    
+    <h3>Make It / Don't Make It — Position Paytable (5% Target Margin)</h3>
+    <p>The following table shows quoted payouts by position using the counting-from-top convention (position 1 = one step from the top). Verified at 5% target margin by AIQ Consulting Limited.</p>
+    <table class="data-table" style="font-size:13px">
+      <thead>
+        <tr><th>Position</th><th>Zone</th><th>Win Chance</th><th>Make It Pays</th><th>Margin</th><th>Lose Chance</th><th>Don't Pay</th><th>Margin</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td style="color:#e74c3c">ZONE</td><td>60.1%</td><td class="td-gold">1.6</td><td class="td-green">3.9%</td><td>39.9%</td><td class="td-gold">2.4</td><td class="td-green">4.2%</td></tr>
+        <tr><td>2</td><td style="color:#e74c3c">ZONE</td><td>58.6%</td><td class="td-gold">1.6</td><td class="td-green">6.3%</td><td>41.4%</td><td class="td-gold">2.3</td><td class="td-green">4.7%</td></tr>
+        <tr><td>3</td><td style="color:#e74c3c">ZONE</td><td>56.2%</td><td class="td-gold">1.7</td><td class="td-green">4.4%</td><td>43.8%</td><td class="td-gold">2.2</td><td class="td-green">3.7%</td></tr>
+        <tr><td>4</td><td style="color:#e74c3c">ZONE</td><td>53.1%</td><td class="td-gold">1.8</td><td class="td-green">4.4%</td><td>46.9%</td><td class="td-gold">2.0</td><td class="td-green">6.2%</td></tr>
+        <tr><td>5</td><td style="color:#e74c3c">ZONE</td><td>49.2%</td><td class="td-gold">1.9</td><td class="td-green">6.5%</td><td>50.8%</td><td class="td-gold">1.9</td><td class="td-green">3.5%</td></tr>
+        <tr><td>6</td><td style="color:#f39c12">SHORT</td><td>44.7%</td><td class="td-gold">2.1</td><td class="td-green">6.2%</td><td>55.3%</td><td class="td-gold">1.7</td><td class="td-green">6.0%</td></tr>
+        <tr><td>7</td><td style="color:#f39c12">SHORT</td><td>41.7%</td><td class="td-gold">2.3</td><td class="td-green">4.1%</td><td>58.3%</td><td class="td-gold">1.6</td><td class="td-green">6.7%</td></tr>
+        <tr><td>8</td><td style="color:#f39c12">SHORT</td><td>38.7%</td><td class="td-gold">2.5</td><td class="td-green">3.1%</td><td>61.3%</td><td class="td-gold">1.6</td><td class="td-green">2.0%</td></tr>
+        <tr><td>9</td><td style="color:#27ae60">CLASSIC</td><td>35.9%</td><td class="td-gold">2.6</td><td class="td-green">6.7%</td><td>64.1%</td><td class="td-gold">1.5</td><td class="td-green">3.8%</td></tr>
+        <tr><td>10</td><td style="color:#27ae60">CLASSIC</td><td>33.2%</td><td class="td-gold">2.9</td><td class="td-green">3.6%</td><td>66.8%</td><td class="td-gold">1.4</td><td class="td-green">6.5%</td></tr>
+        <tr><td>11</td><td style="color:#27ae60">CLASSIC</td><td>30.8%</td><td class="td-gold">3.1</td><td class="td-green">4.6%</td><td>69.2%</td><td class="td-gold">1.4</td><td class="td-green">3.1%</td></tr>
+        <tr><td>12</td><td style="color:#3498db">LONG</td><td>28.5%</td><td class="td-gold">3.3</td><td class="td-green">5.8%</td><td>71.5%</td><td class="td-gold">1.3</td><td class="td-green">7.1%</td></tr>
+        <tr><td>13</td><td style="color:#3498db">LONG</td><td>26.4%</td><td class="td-gold">3.6</td><td class="td-green">4.8%</td><td>73.6%</td><td class="td-gold">1.3</td><td class="td-green">4.4%</td></tr>
+        <tr><td>14</td><td style="color:#3498db">LONG</td><td>24.5%</td><td class="td-gold">3.9</td><td class="td-green">4.4%</td><td>75.5%</td><td class="td-gold">1.3</td><td class="td-green">1.9%</td></tr>
+        <tr><td>15</td><td style="color:#9b59b6">EPIC</td><td>22.7%</td><td class="td-gold">4.2</td><td class="td-green">4.6%</td><td>77.3%</td><td class="td-gold">1.2</td><td class="td-green">7.2%</td></tr>
+        <tr><td>16</td><td style="color:#9b59b6">EPIC</td><td>21.0%</td><td class="td-gold">4.5</td><td class="td-green">5.3%</td><td>79.0%</td><td class="td-gold">1.2</td><td class="td-green">5.2%</td></tr>
+        <tr><td>17</td><td style="color:#9b59b6">EPIC</td><td>19.5%</td><td class="td-gold">4.9</td><td class="td-green">4.5%</td><td>80.5%</td><td class="td-gold">1.2</td><td class="td-green">3.4%</td></tr>
+        <tr><td>18</td><td style="color:#9b59b6">EPIC</td><td>18.1%</td><td class="td-gold">5.3</td><td class="td-green">4.2%</td><td>81.9%</td><td class="td-gold">1.2</td><td class="td-green">1.7%</td></tr>
+        <tr><td>19</td><td style="color:#9b59b6">EPIC</td><td>16.7%</td><td class="td-gold">5.7</td><td class="td-green">4.6%</td><td>83.3%</td><td class="td-gold">1.1</td><td class="td-green">8.4%</td></tr>
+        <tr><td>20</td><td style="color:#9b59b6">EPIC</td><td>15.5%</td><td class="td-gold">6.1</td><td class="td-green">5.4%</td><td>84.5%</td><td class="td-gold">1.1</td><td class="td-green">7.1%</td></tr>
+      </tbody>
+    </table>
+    <p class="small-print">Positions 21–29 available on request. Don't Make It minimum payout is 1.1 (positions 19+). Margins are verified at 5% target; minor variance due to rounding to one decimal place is unavoidable and acceptable. Full position-by-position analysis including simulation verification: AIQ Consulting Limited.</p>
 
     <div class="callout callout-blue">
       <div class="callout-title">Dealer Note — Starting Position Odds</div>
@@ -639,7 +671,7 @@
     <div class="section-label">§4</div>
     <div class="section-title">House Edge Analysis</div>
 
-    <p>The house edge figures in this document are verified by independent mathematical simulation conducted by AIQ Consulting Limited. The simulation confirmed the closed-form probability analysis across all bet types.</p>
+    <p>The house edge figures in this document target a 5% operator margin across all bet types, calculated from the verified probability analysis by AIQ Consulting Limited. Actual margins vary slightly by bet type due to rounding of quoted odds to one decimal place. The operator may adjust quoted odds to achieve any target margin within the framework below.</p>
 
     <h3>Throw Bet Margin Calculation</h3>
     <p>Each bet's true fair odds are reduced by a house margin. The following shows the calculation for Diff 3 (the minimum margin bet):</p>
@@ -658,13 +690,13 @@
         <tr><th>Bet Type</th><th>House Edge</th><th>Notes</th></tr>
       </thead>
       <tbody>
-        <tr><td>Diff 3 (best player bet)</td><td class="td-green">4.43%</td><td>Most favourable for player</td></tr>
-        <tr><td>Diff 1</td><td>6.67%</td><td>Most frequently bet</td></tr>
-        <tr><td>Diff 5</td><td>5.56%</td><td>Long shot</td></tr>
-        <tr><td>Diff 2</td><td>7.78%</td><td></td></tr>
-        <tr><td>Diff 4</td><td>7.78%</td><td></td></tr>
-        <tr><td>Double (0)</td><td class="td-red">9.87%</td><td>Least favourable for player</td></tr>
-        <tr><td>Make It / Don't Make It</td><td>Configurable</td><td>Set by operator at game start</td></tr>
+        <tr><td>Diff 2 (best player bet)</td><td class="td-green">4.44%</td><td>Most favourable for player</td></tr>
+        <tr><td>Diff 0 (Double)</td><td class="td-green">5.00%</td><td>Instant loss — high tension bet</td></tr>
+        <tr><td>Diff 3</td><td class="td-green">5.00%</td><td></td></tr>
+        <tr><td>Diff 5</td><td class="td-green">5.00%</td><td>Long shot</td></tr>
+        <tr><td>Diff 1</td><td>5.56%</td><td>Most frequently hit</td></tr>
+        <tr><td>Diff 4</td><td>5.56%</td><td></td></tr>
+        <tr><td>Make It / Don't Make It</td><td>~5% target</td><td>Position-dependent — see full paytable</td></tr>
       </tbody>
     </table>
 
@@ -672,7 +704,7 @@
     <table class="data-table">
       <thead><tr><th>Game</th><th>Typical House Edge Range</th></tr></thead>
       <tbody>
-        <tr><td>LaScala (Diff bets)</td><td class="td-green">4.43% – 9.87%</td></tr>
+        <tr><td>LaScala (Diff bets, target)</td><td class="td-green">~5% (4.44% – 5.56%)</td></tr>
         <tr><td>Craps (Pass Line)</td><td>1.41%</td></tr>
         <tr><td>Craps (Proposition bets)</td><td>9.09% – 16.67%</td></tr>
         <tr><td>Roulette (European)</td><td>2.70%</td></tr>

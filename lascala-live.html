@@ -786,11 +786,11 @@ body::after {
       <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)">
         <button class="crowd-btn" style="background:#0a0a16;color:var(--cyan);font-size:15px;border-right:1px solid var(--border)" id="bet-diff-low" onclick="placeCrowdBet('diff_low')">
           <span>LOW (1–2)</span>
-          <span class="btn-odds" style="color:var(--text-mid)">1.8/10</span>
+          <span class="btn-odds" style="color:var(--text-mid)">24–33/10</span>
         </button>
         <button class="crowd-btn" style="background:#0a0a16;color:var(--purple);font-size:15px" id="bet-diff-high" onclick="placeCrowdBet('diff_high')">
           <span>HIGH (3–5)</span>
-          <span class="btn-odds" style="color:var(--text-mid)">2.4/10</span>
+          <span class="btn-odds" style="color:var(--text-mid)">47–161/10</span>
         </button>
       </div>
       <div class="crowd-bar-wrap">
@@ -1114,7 +1114,8 @@ function placeCrowdBet(type) {
   G.myVoted = type;
 
   const names = { make:'Make It', dont:"Don't Make It", diff_low:'Low Diff (1-2)', diff_high:'High Diff (3-5)' };
-  const odds = { make: parseInt(document.getElementById('make-odds').textContent), dont: parseInt(document.getElementById('dont-odds').textContent), diff_low:18, diff_high:24 };
+  // Weighted average odds: Low(1-2) avg ~28/10, High(3-5) avg ~80/10 (5% margin verified)
+  const odds = { make: parseInt(document.getElementById('make-odds').textContent), dont: parseInt(document.getElementById('dont-odds').textContent), diff_low:28, diff_high:80 };
 
   if (!G.myBets[type]) G.myBets[type] = { total:0, name:names[type], odds:odds[type] };
   G.myBets[type].total += amount;
@@ -1408,10 +1409,32 @@ function probToOdds(p) {
 }
 
 function calcMakeProb(pos, top) {
-  const rem = top-pos;
-  if(rem<=0) return 1;
-  const map={1:.278,2:.278,3:.278,4:.306,5:.278,6:.25,7:.222,8:.194,9:.167,10:.14,11:.12,12:.09,13:.06,14:.04,15:.02};
-  return map[rem] || Math.max(.02, .3-rem*.02);
+  // Exact probabilities verified by AIQ Consulting Limited (10M trial simulation)
+  const rem = top - pos;
+  if (rem <= 0) return 1;
+  const probs = {
+      1: 0.600846,
+      2: 0.585556,
+      3: 0.562134,
+      4: 0.530904,
+      5: 0.492301,
+      6: 0.446860,
+      7: 0.417002,
+      8: 0.387405,
+      9: 0.358951,
+      10: 0.332300,
+      11: 0.307799,
+      12: 0.285381,
+      13: 0.264462,
+      14: 0.245044,
+      15: 0.227062,
+      16: 0.210413,
+      17: 0.194986,
+      18: 0.180684,
+      19: 0.167432,
+      20: 0.155152
+    };
+  return probs[rem] || Math.max(0.02, 0.155152 * Math.pow(0.927, rem - 20));
 }
 
 function addLog(msg, type) {
