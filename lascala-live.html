@@ -943,7 +943,7 @@ function startGame() {
     scheduleAutoThrow();
   }
 
-  addLog('Game started! Ladder: '+G.ladderSize+' · Position: '+G.pos, 'ev');
+  addLog('Game started! Ladder: '+G.ladderSize+' · Starting '+G.pos+' steps from top', 'ev');
   addLog(name + ' joins as ' + G.role, 'ev');
   renderAll();
   simulateCrowdBets();
@@ -952,13 +952,18 @@ function startGame() {
 function renderStartPosBtns() {
   const c = document.getElementById('start-pos-btns');
   c.innerHTML = '';
-  for (let i=1; i<G.ladderSize; i++) {
+  // Steps from top: ladderSize-1 down to 1
+  for (let steps=1; steps<G.ladderSize; steps++) {
+    const actualPos = G.ladderSize - steps;
     const b = document.createElement('button');
     b.className = 'btn-sm';
-    b.textContent = i;
-    if (i === G.pos) { b.style.borderColor='var(--gold)'; b.style.color='var(--gold)'; }
+    const zone = getZone(steps);
+    const zoneColors = {ZONE:'var(--red)',SHORT:'#f39c12',CLASSIC:'var(--green)',LONG:'var(--cyan)',EPIC:'#9b59b6'};
+    b.innerHTML = steps + '<span style="font-size:9px;display:block;color:'+zoneColors[zone]+'">'+zone+'</span>';
+    b.title = steps + ' steps from top';
+    if (actualPos === G.pos) { b.style.borderColor='var(--gold)'; b.style.color='var(--gold)'; }
     b.onclick = () => {
-      G.pos = i; G.startPos = i;
+      G.pos = actualPos; G.startPos = actualPos;
       document.querySelectorAll('#start-pos-btns .btn-sm').forEach(x=>{x.style.borderColor='';x.style.color='';});
       b.style.borderColor='var(--gold)'; b.style.color='var(--gold)';
       renderLadder(); updateOdds();
@@ -989,7 +994,8 @@ function renderLadder() {
     if (i===G.pos) rung.classList.add('here');
 
     const num = document.createElement('div');
-    num.className = 'rung-num'; num.textContent = i;
+    // Display counts from top: top rung = 0 steps to go, bottom = ladderSize steps to go
+    num.className = 'rung-num'; num.textContent = G.ladderSize - i;
 
     const bar = document.createElement('div');
     bar.className = 'rung-bar';
@@ -1231,7 +1237,7 @@ function resolveDice(d1, d2, diff) {
   if (newPos === G.ladderSize) {
     G.pos = newPos;
     renderLadder();
-    addLog('MADE IT! Shooter reaches '+G.ladderSize+'!', 'win');
+    addLog('MADE IT! Shooter reaches the top — 0 steps remaining!', 'win');
     payGameBet('make');
     setTimeout(()=>showOutcome(true), 400);
     return;
@@ -1250,7 +1256,7 @@ function resolveDice(d1, d2, diff) {
   document.getElementById('bet-make-btn').disabled = false;
   document.getElementById('bet-dont-btn').disabled = false;
   document.getElementById('throw-btn').disabled = false;
-  addLog('Now at rung '+G.pos+'. Need '+(G.ladderSize-G.pos)+' more.', 'ev');
+  const stepsLeft = G.ladderSize - G.pos; addLog('Steps from top: '+stepsLeft+' ['+getZone(stepsLeft)+']', 'ev');
   simulateCrowdBets();
   updateOdds();
   renderMyBets();
@@ -1406,6 +1412,14 @@ function loadCards() {
 function probToOdds(p) {
   if(p<=0) return 999;
   return Math.round((1/p-1)*10);
+}
+
+function getZone(steps) {
+  if (steps <= 5) return 'ZONE';
+  if (steps <= 8) return 'SHORT';
+  if (steps <= 11) return 'CLASSIC';
+  if (steps <= 14) return 'LONG';
+  return 'EPIC';
 }
 
 function calcMakeProb(pos, top) {

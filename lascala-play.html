@@ -847,7 +847,7 @@
     </div>
 
     <div class="setup-group">
-      <div class="setup-label">Starting Position (1 to <span id="max-pos-label">9</span>)</div>
+      <div class="setup-label">Starting Position — Steps from Top (1 = Zone, higher = longer game)</div>
       <div class="start-pos-grid" id="start-pos-btns"></div>
     </div>
 
@@ -1069,12 +1069,18 @@ function setBalance(n) {
 function renderStartPosBtns(ladder) {
   const container = document.getElementById('start-pos-btns');
   container.innerHTML = '';
-  for (let i = 1; i < ladder; i++) {
+  // Show steps-from-top (1 = one step away, ladder-1 = furthest)
+  for (let steps = 1; steps < ladder; steps++) {
+    const actualPos = ladder - steps;
+    const zoneNames = {1:'Z',2:'Z',3:'Z',4:'Z',5:'Z',6:'S',7:'S',8:'S',9:'C',10:'C',11:'C',12:'L',13:'L',14:'L'};
+    const zone = zoneNames[steps] || 'E';
+    const zoneColors = {Z:'#e74c3c',S:'#f39c12',C:'#2ecc71',L:'#3498db',E:'#9b59b6'};
     const b = document.createElement('button');
-    b.className = 'sp-btn' + (i === setupStart ? ' selected' : '');
-    b.textContent = i;
+    b.className = 'sp-btn' + (actualPos === setupStart ? ' selected' : '');
+    b.innerHTML = steps + '<span style="font-size:8px;display:block;color:'+zoneColors[zone]+'">'+zone+'</span>';
+    b.title = steps + ' steps from top';
     b.onclick = () => {
-      setupStart = i;
+      setupStart = actualPos;
       document.querySelectorAll('.sp-btn').forEach(x => x.classList.remove('selected'));
       b.classList.add('selected');
     };
@@ -1102,7 +1108,7 @@ function startGame() {
   document.getElementById('setup-screen').style.display = 'none';
   renderAll();
   addLog('Round 1 begins. Shooter: ' + G.players[G.shooter].name, 'event');
-  addLog('Position: ' + G.pos + '. Need to reach: ' + G.ladderSize, 'event');
+  addLog('Starting ' + (G.ladderSize - G.pos) + ' steps from top. Reach position 0 to win.', 'event');
   showShooterSelect();
 }
 
@@ -1150,7 +1156,8 @@ function renderLadder() {
 
     const numEl = document.createElement('div');
     numEl.className = 'rung-num';
-    numEl.textContent = i;
+    // Display steps-from-top: top rung = 0, bottom = ladderSize
+    numEl.textContent = G.ladderSize - i;
 
     const bar = document.createElement('div');
     bar.className = 'rung-bar';
@@ -1262,7 +1269,7 @@ function renderStatus() {
   const zone = zones[remaining] || 'EPIC';
   const zoneColors = {ZONE:'var(--red)',SHORT:'#f39c12',CLASSIC:'var(--green)',LONG:'var(--blue)',EPIC:'#9b59b6'};
   if (G.phase === 'betting') {
-    el.innerHTML = `<span class="text-gold">${shooter.name}</span> is shooting.<br>Steps to top: <strong>${remaining}</strong> &nbsp;<span style="color:${zoneColors[zone]};font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.15em">[${zone}]</span><br>Position: <strong>${G.pos}</strong> of <strong>${G.ladderSize}</strong>`;
+    el.innerHTML = `<span class="text-gold">${shooter.name}</span> is shooting.<br>Steps from top: <strong>${remaining}</strong> &nbsp;<span style="color:${zoneColors[zone]};font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.15em">[${zone}]</span>`;
   } else if (G.phase === 'throwing') {
     el.innerHTML = `Bets locked. <span class="text-gold">${shooter.name}</span> throws!`;
   }
@@ -1359,7 +1366,7 @@ function resolveDice(d1, d2, diff) {
   if (newPos === G.ladderSize) {
     G.pos = newPos;
     renderLadder();
-    addLog(`${shooter.name} MADE IT to ${G.ladderSize}!`, 'win');
+    addLog(`${shooter.name} MADE IT! Reached the top — 0 steps remaining!`, 'win');
     payBets('make', diff, true);
     penaliseDontBets();
     setTimeout(() => showOutcome(true, `${shooter.name} reached the top exactly!<br>Bets on "Make It" pay out.`), 400);
@@ -1377,7 +1384,7 @@ function resolveDice(d1, d2, diff) {
   G.phase = 'betting';
   G.currentBets = {};
   renderAll();
-  addLog(`Now at rung ${G.pos}. Needs ${G.ladderSize - G.pos} more.`);
+  const stepsNow = G.ladderSize - G.pos; const zoneNow = stepsNow<=5?'ZONE':stepsNow<=8?'SHORT':stepsNow<=11?'CLASSIC':stepsNow<=14?'LONG':'EPIC'; addLog(`Steps from top: ${stepsNow} [${zoneNow}]`);
 }
 
 function payBets(key, diff, isOutcome) {
