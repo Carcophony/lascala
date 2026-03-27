@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaScala Daily</title>
+<meta name="description" content="One game. One day. Can you read the ladder? The free daily prediction game from LaScala.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & ROOT ── */
+:root {
+  --bg:       #0c0c14;
+  --bg2:      #13131e;
+  --bg3:      #1a1a28;
+  --bg4:      #202030;
+  --gold:     #c9a84c;
+  --gold2:    #f0c840;
+  --gold-dim: #4a3a10;
+  --green:    #2dc653;
+  --red:      #e63946;
+  --blue:     #4cc9f0;
+  --border:   #252538;
+  --text:     #e8e2d4;
+  --text-mid: #7a7090;
+  --text-dim: #3a3450;
+  --correct:  #2dc653;
+  --wrong:    #e63946;
+  --hedge:    #f0c840;
+  --skip:     #3a3450;
+  --card-radius: 10px;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* Subtle grid background */
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(201,168,76,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── HEADER ── */
+.header {
+  width:100%;max-width:480px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:2;
+}
+
+.logo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:.15em;
+  background:linear-gradient(135deg,#6a5020,#c9a84c,#f0c840,#c9a84c,#6a5020);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.logo-sub {
+  font-size:9px;letter-spacing:.3em;color:var(--text-dim);
+  text-transform:uppercase;display:block;margin-top:-4px;
+}
+
+.header-right {
+  display:flex;align-items:center;gap:12px;
+}
+
+.day-badge {
+  font-size:11px;color:var(--gold);letter-spacing:.15em;
+  background:var(--bg3);border:1px solid var(--gold-dim);
+  border-radius:4px;padding:3px 8px;
+}
+
+.icon-btn {
+  width:32px;height:32px;border-radius:6px;
+  background:var(--bg3);border:1px solid var(--border);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:all .2s;
+}
+.icon-btn:hover{ border-color:var(--gold-dim); }
+
+/* ── MAIN WRAP ── */
+.main {
+  width:100%;max-width:480px;
+  padding:20px;
+  display:flex;flex-direction:column;
+  gap:16px;
+  position:relative;z-index:2;
+  flex:1;
+}
+
+/* ── ZONE STRIP ── */
+.zone-strip {
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;
+  padding:10px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;
+  font-size:12px;letter-spacing:.15em;
+}
+
+.zone-label {
+  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.2em;
+}
+
+/* ── LADDER ── */
+.ladder-wrap {
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--card-radius);
+  padding:14px;
+  position:relative;
+}
+
+.ladder {
+  display:flex;flex-direction:column-reverse;
+  gap:3px;
+}
+
+.rung {
+  display:flex;align-items:center;gap:8px;
+  height:36px;border-radius:5px;padding:0 10px;
+  background:var(--bg3);border:1px solid var(--border);
+  transition:all .35s ease;position:relative;overflow:hidden;
+}
+
+.rung.top-rung {
+  background:linear-gradient(90deg,#0c1e0d,#091608);
+  border-color:var(--green);
+  box-shadow:0 0 12px rgba(45,198,83,.15);
+}
+
+.rung.here {
+  background:linear-gradient(90deg,#1a1508,#261d08);
+  border-color:var(--gold);
+  box-shadow:0 0 18px rgba(201,168,76,.35);
+  animation:rung-pulse 2s ease-in-out infinite;
+}
+
+.rung.prev-here {
+  background:linear-gradient(90deg,#141318,#1a1828);
+  border-color:var(--text-dim);
+}
+
+@keyframes rung-pulse {
+  0%,100%{ box-shadow:0 0 18px rgba(201,168,76,.35); }
+  50%{ box-shadow:0 0 32px rgba(201,168,76,.65); }
+}
+
+/* Throw history trail on rung */
+.rung-trail {
+  position:absolute;right:44px;top:50%;transform:translateY(-50%);
+  display:flex;gap:3px;
+}
+
+.trail-dot {
+  width:6px;height:6px;border-radius:50%;
+  flex-shrink:0;
+}
+
+.rung-num {
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  color:var(--text-dim);width:22px;text-align:right;flex-shrink:0;
+}
+.rung.top-rung .rung-num{ color:var(--green); }
+.rung.here .rung-num{ color:var(--gold2); }
+
+.rung-line{ flex:1;height:1px;background:var(--border); }
+.rung.top-rung .rung-line{ background:var(--green); }
+.rung.here .rung-line{ background:var(--gold); }
+
+.rung-tok {
+  width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--gold);
+  background:radial-gradient(circle at 35% 35%,#f0c840,#8a6a20);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;flex-shrink:0;
+  transition:all .4s cubic-bezier(.34,1.56,.64,1);
+}
+.rung-tok.hidden{ opacity:0;transform:scale(0); }
+
+/* ── DICE REVEAL ── */
+.dice-zone {
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--card-radius);
+  padding:16px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+
+.dice-row {
+  display:flex;align-items:center;gap:14px;
+}
+
+.die {
+  width:60px;height:60px;
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:10px;display:grid;place-items:center;
+  font-size:30px;transition:all .3s;
+}
+
+.die.rolling {
+  animation:die-spin .5s ease-in-out;
+  border-color:var(--gold);
+}
+
+@keyframes die-spin {
+  0%{ transform:rotate(0) scale(1); }
+  25%{ transform:rotate(-18deg) scale(.88); }
+  60%{ transform:rotate(11deg) scale(1.12); }
+  85%{ transform:rotate(-5deg) scale(.96); }
+  100%{ transform:rotate(0) scale(1); }
+}
+
+.die-op {
+  font-family:'Bebas Neue',sans-serif;font-size:28px;
+  color:var(--text-dim);
+}
+
+.diff-result {
+  font-family:'Bebas Neue',sans-serif;font-size:60px;
+  color:var(--gold2);line-height:1;
+  filter:drop-shadow(0 0 12px rgba(240,200,64,.4));
+  min-width:50px;text-align:center;
+}
+
+.dice-label {
+  font-size:10px;letter-spacing:.25em;color:var(--text-mid);
+  text-transform:uppercase;
+}
+
+/* ── PREDICTION PANEL ── */
+.predict-panel {
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--card-radius);
+  overflow:hidden;
+}
+
+.predict-header {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 16px;border-bottom:1px solid var(--border);
+}
+
+.predict-title {
+  font-family:'Bebas Neue',sans-serif;font-size:15px;
+  letter-spacing:.2em;color:var(--text);
+}
+
+.throw-num {
+  font-size:11px;color:var(--text-mid);letter-spacing:.1em;
+}
+
+/* Outcome buttons */
+.outcome-btns {
+  display:grid;grid-template-columns:1fr 1fr;
+  border-bottom:1px solid var(--border);
+}
+
+.outcome-btn {
+  padding:16px;border:none;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  letter-spacing:.1em;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  position:relative;
+}
+
+.outcome-btn.make-btn {
+  background:#0a1a0d;color:var(--green);
+  border-right:1px solid var(--border);
+}
+
+.outcome-btn.dont-btn {
+  background:#1a0808;color:var(--red);
+}
+
+.outcome-btn:hover:not(:disabled) { filter:brightness(1.4); }
+.outcome-btn:disabled { opacity:.3;cursor:not-allowed; }
+.outcome-btn.chosen { filter:brightness(1.6);transform:scale(.97); }
+
+.btn-sub {
+  font-size:10px;color:var(--text-mid);
+  font-family:'DM Mono',monospace;
+  letter-spacing:.1em;
+}
+
+/* Diff prediction grid */
+.diff-grid {
+  display:grid;grid-template-columns:repeat(6,1fr);
+  border-bottom:1px solid var(--border);
+}
+
+.diff-btn {
+  padding:12px 4px;border:none;cursor:pointer;
+  background:var(--bg3);color:var(--text-mid);
+  font-family:'Bebas Neue',sans-serif;font-size:20px;
+  border-right:1px solid var(--border);
+  transition:all .2s;display:flex;flex-direction:column;
+  align-items:center;gap:3px;
+}
+
+.diff-btn:last-child{ border-right:none; }
+.diff-btn:hover:not(:disabled){ background:var(--bg4);color:var(--gold); }
+.diff-btn:disabled{ opacity:.3;cursor:not-allowed; }
+.diff-btn.chosen{ background:#1a1608;color:var(--gold2); }
+.diff-btn.diff-0{ }
+.diff-btn.diff-0:hover:not(:disabled){ color:var(--red); }
+.diff-btn.diff-0.chosen{ background:#1a0808;color:var(--red); }
+
+.diff-odds {
+  font-size:9px;color:var(--text-dim);
+  font-family:'DM Mono',monospace;
+}
+
+/* Skip/Reveal */
+.action-row {
+  display:flex;gap:8px;padding:12px;
+}
+
+.btn-reveal {
+  flex:2;padding:12px;border:none;border-radius:7px;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  letter-spacing:.15em;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));
+  color:var(--bg);
+  box-shadow:0 3px 16px rgba(201,168,76,.25);
+  transition:all .2s;
+}
+
+.btn-reveal:hover:not(:disabled) {
+  transform:translateY(-2px);
+  box-shadow:0 6px 28px rgba(201,168,76,.45);
+}
+.btn-reveal:disabled{ opacity:.3;cursor:not-allowed; }
+
+.btn-skip {
+  flex:1;padding:12px;border:1px solid var(--border);
+  border-radius:7px;background:transparent;
+  color:var(--text-mid);font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.1em;cursor:pointer;
+  transition:all .2s;
+}
+.btn-skip:hover:not(:disabled){ border-color:var(--text-mid); }
+.btn-skip:disabled{ opacity:.3;cursor:not-allowed; }
+
+/* ── THROW HISTORY ── */
+.history-wrap {
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--card-radius);padding:14px;
+}
+
+.history-title {
+  font-family:'Bebas Neue',sans-serif;font-size:13px;
+  letter-spacing:.25em;color:var(--text-mid);
+  margin-bottom:10px;
+}
+
+.history-tiles {
+  display:flex;gap:5px;flex-wrap:wrap;
+}
+
+.h-tile {
+  width:36px;height:48px;border-radius:5px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  transition:all .3s;
+  font-size:10px;
+}
+
+.h-tile.correct {
+  background:#0a1a0d;border-color:var(--green);
+  box-shadow:0 0 8px rgba(45,198,83,.2);
+}
+
+.h-tile.wrong {
+  background:#1a0808;border-color:var(--red);
+}
+
+.h-tile.hedge {
+  background:#1a1608;border-color:var(--gold);
+  box-shadow:0 0 8px rgba(201,168,76,.2);
+}
+
+.h-tile.skip {
+  background:var(--bg3);border-color:var(--text-dim);
+  opacity:.6;
+}
+
+.h-tile .tile-diff {
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  line-height:1;
+}
+
+.h-tile.correct .tile-diff{ color:var(--green); }
+.h-tile.wrong .tile-diff{ color:var(--red); }
+.h-tile.hedge .tile-diff{ color:var(--gold2); }
+.h-tile.skip .tile-diff{ color:var(--text-dim); }
+
+.h-tile .tile-label {
+  font-size:8px;color:var(--text-dim);letter-spacing:.05em;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display:flex;gap:8px;
+}
+
+.stat-chip {
+  flex:1;background:var(--bg2);border:1px solid var(--border);
+  border-radius:7px;padding:10px 8px;text-align:center;
+}
+
+.stat-num {
+  font-family:'Bebas Neue',sans-serif;font-size:26px;
+  color:var(--gold2);line-height:1;
+}
+
+.stat-label {
+  font-size:9px;color:var(--text-dim);letter-spacing:.15em;
+  text-transform:uppercase;margin-top:2px;
+}
+
+/* ── RESULT OVERLAY ── */
+#result-overlay {
+  position:fixed;inset:0;z-index:200;
+  background:rgba(8,8,18,.94);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+
+#result-overlay.show{ display:flex; }
+
+.result-box {
+  background:var(--bg2);border:2px solid var(--gold);
+  border-radius:16px;padding:32px 28px;
+  max-width:400px;width:100%;
+  text-align:center;
+  animation:pop-in .4s cubic-bezier(.34,1.56,.64,1);
+}
+
+.result-box.lose{ border-color:var(--red); }
+
+@keyframes pop-in {
+  from{ transform:scale(.7);opacity:0; }
+  to{ transform:scale(1);opacity:1; }
+}
+
+.result-icon{ font-size:64px;margin-bottom:12px; }
+
+.result-title {
+  font-family:'Bebas Neue',sans-serif;font-size:48px;
+  letter-spacing:.12em;margin-bottom:6px;
+}
+
+.result-box:not(.lose) .result-title{ color:var(--green); }
+.result-box.lose .result-title{ color:var(--red); }
+
+.result-sub {
+  font-size:13px;color:var(--text-mid);
+  margin-bottom:18px;line-height:1.7;
+}
+
+.result-score {
+  font-family:'Bebas Neue',sans-serif;font-size:28px;
+  color:var(--gold2);margin-bottom:16px;
+}
+
+/* Share card */
+.share-card {
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:16px;margin-bottom:16px;
+  text-align:left;
+}
+
+.share-line {
+  font-family:'Bebas Neue',sans-serif;font-size:14px;
+  letter-spacing:.12em;color:var(--gold);
+  margin-bottom:8px;
+}
+
+.share-emojis {
+  font-size:22px;letter-spacing:3px;line-height:1.6;
+  word-break:break-all;
+}
+
+.share-footer {
+  font-size:10px;color:var(--text-dim);
+  letter-spacing:.1em;margin-top:8px;
+}
+
+.btn-share {
+  width:100%;padding:13px;border:none;border-radius:8px;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  letter-spacing:.15em;cursor:pointer;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-dim));
+  color:var(--bg);
+  box-shadow:0 3px 16px rgba(201,168,76,.25);
+  transition:all .2s;
+}
+
+.btn-share:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 28px rgba(201,168,76,.45);
+}
+
+.btn-tomorrow {
+  width:100%;padding:11px;border:1px solid var(--border);
+  border-radius:8px;background:transparent;
+  color:var(--text-mid);font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.1em;cursor:pointer;
+  transition:all .2s;
+}
+
+.btn-tomorrow:hover{ border-color:var(--gold-dim);color:var(--gold); }
+
+/* ── HOW TO STRIP ── */
+.how-strip {
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--card-radius);padding:14px 16px;
+}
+
+.how-title {
+  font-family:'Bebas Neue',sans-serif;font-size:13px;
+  letter-spacing:.25em;color:var(--text-mid);margin-bottom:10px;
+}
+
+.how-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  font-size:11px;color:var(--text-mid);line-height:1.6;
+}
+
+.how-item{ display:flex;gap:6px; }
+.how-icon{ flex-shrink:0;font-size:14px; }
+
+/* ── COUNTDOWN ── */
+.countdown-bar {
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px;
+  font-size:11px;color:var(--text-mid);letter-spacing:.15em;
+}
+
+.countdown-time {
+  font-family:'Bebas Neue',sans-serif;font-size:18px;
+  color:var(--gold);letter-spacing:.1em;
+}
+
+/* ── FOOTER ── */
+footer {
+  width:100%;max-width:480px;
+  text-align:center;padding:20px;
+  font-size:10px;color:var(--text-dim);letter-spacing:.15em;
+  border-top:1px solid var(--border);
+  position:relative;z-index:2;
+}
+
+footer a{
+  color:var(--gold-dim);text-decoration:none;
+}
+footer a:hover{ color:var(--gold); }
+
+/* ── INFO OVERLAY ── */
+#info-overlay {
+  position:fixed;inset:0;z-index:200;
+  background:rgba(8,8,18,.96);backdrop-filter:blur(8px);
+  display:none;align-items:flex-start;justify-content:center;
+  padding:20px;overflow-y:auto;
+}
+#info-overlay.show{ display:flex; }
+
+.info-box {
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:28px;max-width:440px;width:100%;
+  margin:auto;
+}
+
+.info-close {
+  float:right;background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;padding:4px 10px;cursor:pointer;
+  font-size:12px;color:var(--text-mid);font-family:'DM Mono',monospace;
+}
+
+.info-title {
+  font-family:'Bebas Neue',sans-serif;font-size:36px;
+  letter-spacing:.12em;color:var(--gold);margin-bottom:4px;
+}
+
+.info-sub {
+  font-size:11px;color:var(--text-mid);letter-spacing:.15em;
+  margin-bottom:20px;
+}
+
+.info-section{ margin-bottom:18px; }
+.info-section h3 {
+  font-family:'Bebas Neue',sans-serif;font-size:15px;
+  letter-spacing:.2em;color:var(--text);
+  margin-bottom:6px;border-bottom:1px solid var(--border);
+  padding-bottom:4px;
+}
+.info-section p{
+  font-size:12px;color:var(--text-mid);line-height:1.8;
+}
+
+.example-tiles {
+  display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;
+}
+
+/* confetti */
+.cf { position:fixed;width:8px;height:8px;pointer-events:none;z-index:300;animation:cffall linear forwards; }
+@keyframes cffall{ 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+
+/* Streak flame */
+.streak-flame {
+  font-size:14px;
+  animation:flicker .8s ease-in-out infinite alternate;
+}
+@keyframes flicker{ from{opacity:.7}to{opacity:1} }
+
+/* Hedge indicator */
+.hedge-pill {
+  display:inline-block;padding:2px 8px;border-radius:3px;
+  background:#1a1608;border:1px solid var(--gold-dim);
+  color:var(--gold);font-size:9px;letter-spacing:.15em;
+  font-family:'DM Mono',monospace;
+}
+</style>
+</head>
+<body>
+
+<!-- INFO OVERLAY -->
+<div id="info-overlay">
+  <div class="info-box">
+    <button class="info-close" onclick="closeInfo()">✕ CLOSE</button>
+    <div class="info-title">How to Play</div>
+    <div class="info-sub">LASCALA DAILY · ONE GAME · ONE DAY</div>
+
+    <div class="info-section">
+      <h3>The Game</h3>
+      <p>Every day, the same dice sequence plays for everyone in the world. A shooter climbs a numbered ladder. You predict what happens before each throw is revealed. No gambling. No money. Just you vs the ladder.</p>
+    </div>
+
+    <div class="info-section">
+      <h3>The Ladder</h3>
+      <p>Numbers count <strong style="color:var(--text)">down from the top</strong>. Top = 0 steps to go. The shooter moves by the <strong style="color:var(--text)">difference</strong> between two dice — not the total. Roll a 5 and a 2? Move 3 steps. Roll two 4s? Double — game over instantly.</p>
+    </div>
+
+    <div class="info-section">
+      <h3>Your Predictions</h3>
+      <p>Before each throw is revealed, pick one or more:</p>
+      <p style="margin-top:6px"><strong style="color:var(--green)">MAKE IT</strong> — shooter will reach 0 and win the game.<br>
+      <strong style="color:var(--red)">DON'T MAKE IT</strong> — shooter will roll a double and fail.<br>
+      <strong style="color:var(--gold)">DIFF 0–5</strong> — predict the exact difference on this throw.</p>
+    </div>
+
+    <div class="info-section">
+      <h3>Scoring</h3>
+      <p>Correct game prediction: <strong style="color:var(--gold)">+100 pts</strong><br>
+      Correct diff prediction: <strong style="color:var(--gold)">+50 pts</strong> (bonus for rare diffs)<br>
+      Hedge executed: <strong style="color:var(--gold)">+200 pts</strong> (backed both sides, both could win)<br>
+      Wrong: <strong style="color:var(--red)">0 pts</strong> (no penalty — just the shame)</p>
+    </div>
+
+    <div class="info-section">
+      <h3>Your Result Tiles</h3>
+      <div class="example-tiles">
+        <div class="h-tile correct"><div class="tile-diff" style="color:var(--green)">3</div><div class="tile-label">DIFF ✓</div></div>
+        <div class="h-tile wrong"><div class="tile-diff" style="color:var(--red)">1</div><div class="tile-label">DIFF ✗</div></div>
+        <div class="h-tile hedge"><div class="tile-diff" style="color:var(--gold2)">💛</div><div class="tile-label">HEDGE</div></div>
+        <div class="h-tile correct"><div class="tile-diff" style="color:var(--green)">🏆</div><div class="tile-label">WIN ✓</div></div>
+        <div class="h-tile wrong"><div class="tile-diff" style="color:var(--red)">💀</div><div class="tile-label">LOSS ✓</div></div>
+        <div class="h-tile skip"><div class="tile-diff" style="color:var(--text-dim)">—</div><div class="tile-label">SKIP</div></div>
+      </div>
+      <p style="margin-top:8px">Share your tiles after the game — they reveal your prediction accuracy without spoiling the result for others.</p>
+    </div>
+
+    <div class="info-section">
+      <h3>The Zones</h3>
+      <p>
+        <span style="color:var(--red)">🎯 ZONE (1–5)</span> — one throw could win it.<br>
+        <span style="color:#f39c12">⚡ SHORT (6–8)</span> — close, exciting odds.<br>
+        <span style="color:var(--green)">🎲 CLASSIC (9–11)</span> — balanced game.<br>
+        <span style="color:var(--blue)">🪜 LONG (12–14)</span> — shooter is underdog.<br>
+        <span style="color:#9b59b6">🌌 EPIC (15+)</span> — rare, dramatic, big odds.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div id="result-overlay">
+  <div class="result-box" id="result-box">
+    <div class="result-icon" id="r-icon">🏆</div>
+    <div class="result-title" id="r-title">MADE IT!</div>
+    <div class="result-sub" id="r-sub"></div>
+    <div class="result-score" id="r-score"></div>
+
+    <div class="share-card" id="share-card">
+      <div class="share-line" id="share-line"></div>
+      <div class="share-emojis" id="share-emojis"></div>
+      <div class="share-footer">lascala.daily · play free at carcophony.github.io/lascala</div>
+    </div>
+
+    <button class="btn-share" onclick="shareResult()">📋 COPY RESULT</button>
+    <button class="btn-tomorrow" onclick="closeResult()">✕ CLOSE</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="logo">LaScala</div>
+    <div class="logo-sub">Daily</div>
+  </div>
+  <div class="header-right">
+    <div class="day-badge" id="day-badge">#001</div>
+    <div class="icon-btn" onclick="openInfo()" title="How to play">?</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- Zone + countdown -->
+  <div class="zone-strip">
+    <span id="zone-emoji">🎲</span>
+    <span class="zone-label" id="zone-label" style="color:var(--green)">CLASSIC</span>
+    <span style="color:var(--text-dim);font-size:11px">·</span>
+    <span id="steps-label" style="font-size:11px;color:var(--text-mid)">9 steps from top</span>
+    <span style="color:var(--text-dim);font-size:11px;margin-left:auto">Next game in</span>
+    <span class="countdown-time" id="countdown">—</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-chip">
+      <div class="stat-num" id="stat-score">0</div>
+      <div class="stat-label">Score</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-num" id="stat-streak">0 <span class="streak-flame" id="streak-flame" style="display:none">🔥</span></div>
+      <div class="stat-label">Streak</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-num" id="stat-played">0</div>
+      <div class="stat-label">Played</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-num" id="stat-best">0</div>
+      <div class="stat-label">Best</div>
+    </div>
+  </div>
+
+  <!-- Ladder -->
+  <div class="ladder-wrap">
+    <div class="ladder" id="ladder"></div>
+  </div>
+
+  <!-- Dice -->
+  <div class="dice-zone">
+    <div class="dice-row">
+      <div class="die" id="die1">?</div>
+      <div class="die-op">−</div>
+      <div class="die" id="die2">?</div>
+      <div class="die-op">=</div>
+      <div>
+        <div class="diff-result" id="diff-show">—</div>
+        <div class="dice-label" style="text-align:center">DIFF</div>
+      </div>
+    </div>
+    <div class="dice-label" id="dice-msg">Choose your predictions, then reveal.</div>
+  </div>
+
+  <!-- Prediction panel -->
+  <div class="predict-panel">
+    <div class="predict-header">
+      <div class="predict-title">Your Prediction</div>
+      <div class="throw-num" id="throw-label">Throw 1</div>
+    </div>
+
+    <!-- Game outcome buttons -->
+    <div class="outcome-btns">
+      <button class="outcome-btn make-btn" id="btn-make" onclick="pickOutcome('make')">
+        MAKE IT
+        <span class="btn-sub" id="make-odds-label">Loading...</span>
+      </button>
+      <button class="outcome-btn dont-btn" id="btn-dont" onclick="pickOutcome('dont')">
+        DON'T MAKE IT
+        <span class="btn-sub" id="dont-odds-label">Loading...</span>
+      </button>
+    </div>
+
+    <!-- Diff grid -->
+    <div class="diff-grid">
+      <button class="diff-btn diff-0" id="dbtn-0" onclick="pickDiff(0)">
+        0<div class="diff-odds">4.7/1</div>
+      </button>
+      <button class="diff-btn" id="dbtn-1" onclick="pickDiff(1)">
+        1<div class="diff-odds">2.4/1</div>
+      </button>
+      <button class="diff-btn" id="dbtn-2" onclick="pickDiff(2)">
+        2<div class="diff-odds">3.3/1</div>
+      </button>
+      <button class="diff-btn" id="dbtn-3" onclick="pickDiff(3)">
+        3<div class="diff-odds">4.7/1</div>
+      </button>
+      <button class="diff-btn" id="dbtn-4" onclick="pickDiff(4)">
+        4<div class="diff-odds">7.5/1</div>
+      </button>
+      <button class="diff-btn" id="dbtn-5" onclick="pickDiff(5)">
+        5<div class="diff-odds">16.1/1</div>
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="btn-reveal" id="btn-reveal" onclick="revealThrow()">
+        🎲 REVEAL THROW
+      </button>
+      <button class="btn-skip" id="btn-skip" onclick="skipThrow()">
+        SKIP
+      </button>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-wrap">
+    <div class="history-title">— THROW HISTORY —</div>
+    <div class="history-tiles" id="history-tiles">
+      <div style="font-size:11px;color:var(--text-dim)">No throws yet. Make your first prediction above.</div>
+    </div>
+  </div>
+
+  <!-- How to -->
+  <div class="how-strip">
+    <div class="how-title">— QUICK GUIDE —</div>
+    <div class="how-grid">
+      <div class="how-item"><span class="how-icon">🎯</span><span>Predict Make It, Don't Make It, or exact diff before each throw</span></div>
+      <div class="how-item"><span class="how-icon">🎲</span><span>Diff = bigger die minus smaller. 0 = double = instant end</span></div>
+      <div class="how-item"><span class="how-icon">💛</span><span>Hedge: back both sides at different throws for a guaranteed edge</span></div>
+      <div class="how-item"><span class="how-icon">📋</span><span>Share your emoji result — it doesn't spoil the game for others</span></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  LASCALA DAILY · FREE TO PLAY · <a href="lascala-live.html">PLAY LIVE →</a><br>
+  <span style="opacity:.5">© 2025 MATCHLESS GAMES LIMITED</span>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  LASCALA DAILY ENGINE
+// ═══════════════════════════════════════════════════════
+
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+const DIFF_ODDS = [4.7, 2.4, 3.3, 4.7, 7.5, 16.1];
+const DIFF_SCORE = [50, 30, 40, 50, 70, 100]; // bonus pts for rarer diffs
+
+// ── DAILY SEED SYSTEM ──────────────────────────────────
+// Every player on every device gets the exact same game today
+
+function getDayNumber() {
+  const epoch = new Date('2025-01-01T00:00:00Z');
+  const now = new Date();
+  return Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+}
+
+function seededRandom(seed) {
+  // Mulberry32 — fast, seedable, good distribution
+  let t = seed + 0x6D2B79F5;
+  t = Math.imul(t ^ t >>> 15, t | 1);
+  t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+  return ((t ^ t >>> 14) >>> 0) / 4294967296;
+}
+
+function generateDailyGame(dayNum) {
+  // Generate a full game sequence from today's seed
+  // Ladder: 7–15 steps, start position varied
+  let seed = dayNum * 1000;
+
+  const ladderOptions = [7, 8, 9, 10, 11, 12, 13, 14, 15];
+  const ladderIdx = Math.floor(seededRandom(seed++) * ladderOptions.length);
+  const ladderSize = ladderOptions[ladderIdx];
+
+  // Start position: 4 to ladderSize-1 steps from top
+  const minSteps = 4;
+  const maxSteps = ladderSize - 1;
+  const startSteps = minSteps + Math.floor(seededRandom(seed++) * (maxSteps - minSteps + 1));
+  const startPos = ladderSize - startSteps; // actual position on ladder
+
+  // Generate up to 30 throws
+  const throws = [];
+  for (let i = 0; i < 30; i++) {
+    const d1 = 1 + Math.floor(seededRandom(seed++) * 6);
+    const d2 = 1 + Math.floor(seededRandom(seed++) * 6);
+    throws.push([d1, d2]);
+  }
+
+  return { ladderSize, startPos, startSteps, throws };
+}
+
+// ── GAME STATE ─────────────────────────────────────────
+
+const dayNum = getDayNumber();
+const dailyGame = generateDailyGame(dayNum);
+
+let G = {
+  ladderSize: dailyGame.ladderSize,
+  pos: dailyGame.startPos,       // internal position (counts up)
+  startPos: dailyGame.startPos,
+  startSteps: dailyGame.startSteps,
+  throws: dailyGame.throws,
+  throwIdx: 0,
+  phase: 'predict',  // predict | revealing | done
+  // Predictions for this throw
+  pickedOutcome: null,  // 'make' | 'dont' | null
+  pickedDiff: null,     // 0-5 | null
+  // History
+  history: [],          // [{diff, d1, d2, pickedOutcome, pickedDiff, outcomeResult, diffResult, isHedge}]
+  // Scoring
+  score: 0,
+  // Hedge tracking
+  hasMakeBet: false,
+  hasDontBet: false,
+  hedgeExecuted: false,
+  // Game over
+  gameWon: false,
+  // Stats (persisted)
+  streak: 0,
+  played: 0,
+  best: 0,
+  // Already played today?
+  todayDone: false,
+  todayResult: null,
+};
+
+// ── PERSISTENCE ────────────────────────────────────────
+
+function loadStats() {
+  try {
+    const s = JSON.parse(localStorage.getItem('lascala_daily_stats') || '{}');
+    G.streak = s.streak || 0;
+    G.played = s.played || 0;
+    G.best = s.best || 0;
+
+    const lastDay = s.lastDay || -1;
+    if (lastDay === dayNum) {
+      G.todayDone = true;
+      G.todayResult = s.todayResult || null;
+      G.score = s.todayScore || 0;
+    } else if (lastDay < dayNum - 1) {
+      // Missed a day — reset streak
+      G.streak = 0;
+    }
+  } catch(e) {}
+}
+
+function saveStats() {
+  try {
+    localStorage.setItem('lascala_daily_stats', JSON.stringify({
+      streak: G.streak,
+      played: G.played,
+      best: G.best,
+      lastDay: dayNum,
+      todayScore: G.score,
+      todayResult: G.todayResult,
+    }));
+  } catch(e) {}
+}
+
+// ── ZONE SYSTEM ────────────────────────────────────────
+
+function getZone(steps) {
+  if (steps <= 5) return { name:'ZONE', emoji:'🎯', color:'var(--red)' };
+  if (steps <= 8) return { name:'SHORT', emoji:'⚡', color:'#f39c12' };
+  if (steps <= 11) return { name:'CLASSIC', emoji:'🎲', color:'var(--green)' };
+  if (steps <= 14) return { name:'LONG', emoji:'🪜', color:'var(--blue)' };
+  return { name:'EPIC', emoji:'🌌', color:'#9b59b6' };
+}
+
+function stepsFromTop() {
+  return G.ladderSize - G.pos;
+}
+
+// ── PROBABILITY (verified AIQ) ─────────────────────────
+
+const EXACT_PROBS = {
+  1:0.600846,2:0.585556,3:0.562134,4:0.530904,5:0.492301,
+  6:0.446860,7:0.417002,8:0.387405,9:0.358951,10:0.332300,
+  11:0.307799,12:0.285381,13:0.264462,14:0.245044,15:0.227062,
+  16:0.210413,17:0.194986,18:0.180684,19:0.167432,20:0.155152
+};
+
+function calcMakeProb(pos, top) {
+  const rem = top - pos;
+  if (rem <= 0) return 1;
+  return EXACT_PROBS[rem] || Math.max(0.02, 0.155152 * Math.pow(0.927, rem - 20));
+}
+
+function probToOdds(p) {
+  if (p <= 0) return 999;
+  return ((1/p - 1)).toFixed(1);
+}
+
+// ── RENDER ─────────────────────────────────────────────
+
+function renderAll() {
+  renderLadder();
+  renderZone();
+  renderOdds();
+  renderStats();
+  renderHistory();
+  renderThrowLabel();
+}
+
+function renderLadder() {
+  const c = document.getElementById('ladder');
+  c.innerHTML = '';
+  for (let i = 0; i <= G.ladderSize; i++) {
+    const rung = document.createElement('div');
+    rung.className = 'rung';
+    if (i === G.ladderSize) rung.classList.add('top-rung');
+    if (i === G.pos) rung.classList.add('here');
+
+    const num = document.createElement('div');
+    num.className = 'rung-num';
+    num.textContent = G.ladderSize - i; // count from top
+
+    const line = document.createElement('div');
+    line.className = 'rung-line';
+
+    const tok = document.createElement('div');
+    tok.className = 'rung-tok' + (i === G.pos ? '' : ' hidden');
+    tok.textContent = '🎲';
+
+    rung.appendChild(num);
+    rung.appendChild(line);
+    rung.appendChild(tok);
+    c.appendChild(rung);
+  }
+}
+
+function renderZone() {
+  const steps = stepsFromTop();
+  const zone = getZone(steps);
+  document.getElementById('zone-emoji').textContent = zone.emoji;
+  document.getElementById('zone-label').textContent = zone.name;
+  document.getElementById('zone-label').style.color = zone.color;
+  document.getElementById('steps-label').textContent = steps + ' step' + (steps===1?'':'s') + ' from top';
+}
+
+function renderOdds() {
+  const makeP = calcMakeProb(G.pos, G.ladderSize);
+  const dontP = 1 - makeP;
+  document.getElementById('make-odds-label').textContent = probToOdds(makeP) + '/1 · Make It';
+  document.getElementById('dont-odds-label').textContent = probToOdds(dontP) + "/1 · Don't";
+}
+
+function renderStats() {
+  document.getElementById('stat-score').textContent = G.score;
+  document.getElementById('stat-streak').textContent = G.streak;
+  document.getElementById('stat-played').textContent = G.played;
+  document.getElementById('stat-best').textContent = G.best;
+  document.getElementById('streak-flame').style.display = G.streak >= 3 ? 'inline' : 'none';
+}
+
+function renderHistory() {
+  const c = document.getElementById('history-tiles');
+  if (!G.history.length) {
+    c.innerHTML = '<div style="font-size:11px;color:var(--text-dim)">No throws yet. Make your first prediction above.</div>';
+    return;
+  }
+  c.innerHTML = '';
+  G.history.forEach(h => {
+    const tile = document.createElement('div');
+    let cls = 'h-tile';
+    let icon = '', label = '';
+
+    if (h.isHedge) {
+      cls += ' hedge';
+      icon = '💛';
+      label = 'HEDGE';
+    } else if (h.isGameEnd) {
+      // Game end throw
+      if (h.outcomeResult === 'correct') {
+        cls += ' correct';
+        icon = h.gameWon ? '🏆' : '💀';
+        label = h.gameWon ? 'WIN ✓' : 'LOSS ✓';
+      } else if (h.outcomeResult === 'wrong') {
+        cls += ' wrong';
+        icon = h.gameWon ? '🏆' : '💀';
+        label = h.gameWon ? 'WIN ✗' : 'LOSS ✗';
+      } else {
+        cls += ' skip';
+        icon = h.gameWon ? '🏆' : '💀';
+        label = 'END';
+      }
+    } else if (h.diffResult === 'correct') {
+      cls += ' correct';
+      icon = h.diff;
+      label = 'DIFF ✓';
+    } else if (h.diffResult === 'wrong') {
+      cls += ' wrong';
+      icon = h.diff;
+      label = 'DIFF ✗';
+    } else {
+      cls += ' skip';
+      icon = h.diff !== undefined ? h.diff : '—';
+      label = h.skipped ? 'SKIP' : '·';
+    }
+
+    tile.className = cls;
+    tile.innerHTML = `<div class="tile-diff">${icon}</div><div class="tile-label">${label}</div>`;
+    c.appendChild(tile);
+  });
+}
+
+function renderThrowLabel() {
+  document.getElementById('throw-label').textContent =
+    'Throw ' + (G.throwIdx + 1);
+}
+
+// ── PREDICTIONS ────────────────────────────────────────
+
+function pickOutcome(type) {
+  if (G.phase !== 'predict' || G.todayDone) return;
+  G.pickedOutcome = G.pickedOutcome === type ? null : type;
+  document.getElementById('btn-make').classList.toggle('chosen', G.pickedOutcome === 'make');
+  document.getElementById('btn-dont').classList.toggle('chosen', G.pickedOutcome === 'dont');
+
+  // Track hedge: if they back both make and dont across throws
+  if (type === 'make') G.hasMakeBet = true;
+  if (type === 'dont') G.hasDontBet = true;
+}
+
+function pickDiff(d) {
+  if (G.phase !== 'predict' || G.todayDone) return;
+  G.pickedDiff = G.pickedDiff === d ? null : d;
+  for (let i = 0; i <= 5; i++) {
+    document.getElementById('dbtn-'+i).classList.toggle('chosen', G.pickedDiff === i);
+  }
+}
+
+// ── REVEAL ─────────────────────────────────────────────
+
+function revealThrow() {
+  if (G.phase !== 'predict' || G.todayDone) return;
+
+  G.phase = 'revealing';
+  disableInputs();
+
+  const [d1, d2] = G.throws[G.throwIdx];
+  const diff = Math.abs(d1 - d2);
+
+  // Animate dice
+  const die1 = document.getElementById('die1');
+  const die2 = document.getElementById('die2');
+  die1.classList.add('rolling');
+  die2.classList.add('rolling');
+
+  let frame = 0;
+  const anim = setInterval(() => {
+    die1.textContent = DICE_FACES[Math.floor(Math.random()*6)];
+    die2.textContent = DICE_FACES[Math.floor(Math.random()*6)];
+    frame++;
+    if (frame > 14) {
+      clearInterval(anim);
+      die1.textContent = DICE_FACES[d1-1];
+      die2.textContent = DICE_FACES[d2-1];
+      die1.classList.remove('rolling');
+      die2.classList.remove('rolling');
+      document.getElementById('diff-show').textContent = diff;
+      resolveThrow(d1, d2, diff);
+    }
+  }, 55);
+}
+
+function resolveThrow(d1, d2, diff) {
+  G.throwIdx++;
+  let pts = 0;
+  let histEntry = {
+    d1, d2, diff,
+    pickedOutcome: G.pickedOutcome,
+    pickedDiff: G.pickedDiff,
+    outcomeResult: null,
+    diffResult: null,
+    skipped: (!G.pickedOutcome && G.pickedDiff === null),
+    isGameEnd: false,
+    isHedge: false,
+    gameWon: false,
+  };
+
+  // Score diff prediction
+  if (G.pickedDiff !== null) {
+    if (G.pickedDiff === diff) {
+      histEntry.diffResult = 'correct';
+      pts += DIFF_SCORE[diff];
+      document.getElementById('dice-msg').textContent = '✓ Diff ' + diff + ' — correct! +' + DIFF_SCORE[diff] + ' pts';
+    } else {
+      histEntry.diffResult = 'wrong';
+      document.getElementById('dice-msg').textContent = '✗ You predicted ' + G.pickedDiff + ', got ' + diff;
+    }
+  } else {
+    document.getElementById('dice-msg').textContent = diff === 0 ? '💀 DOUBLE!' : 'Diff ' + diff + ' — move ' + diff + ' steps.';
+  }
+
+  // Check for hedge (backed both sides across game)
+  if (G.hasMakeBet && G.hasDontBet && !G.hedgeExecuted) {
+    G.hedgeExecuted = true;
+    histEntry.isHedge = true;
+    pts += 200;
+    document.getElementById('dice-msg').textContent = '💛 HEDGE EXECUTED! Both sides backed. +200 pts';
+  }
+
+  // Move shooter or end game
+  if (diff === 0) {
+    // DOUBLE — game over, shooter loses
+    histEntry.isGameEnd = true;
+    histEntry.gameWon = false;
+    if (G.pickedOutcome === 'dont') {
+      histEntry.outcomeResult = 'correct';
+      pts += 100;
+    } else if (G.pickedOutcome === 'make') {
+      histEntry.outcomeResult = 'wrong';
+    }
+    G.history.push(histEntry);
+    G.score += pts;
+    renderAll();
+    setTimeout(() => endGame(false), 600);
+    return;
+  }
+
+  let newPos = G.pos + diff;
+  if (newPos === G.ladderSize) {
+    // MADE IT
+    G.pos = newPos;
+    histEntry.isGameEnd = true;
+    histEntry.gameWon = true;
+    if (G.pickedOutcome === 'make') {
+      histEntry.outcomeResult = 'correct';
+      pts += 100;
+    } else if (G.pickedOutcome === 'dont') {
+      histEntry.outcomeResult = 'wrong';
+    }
+    G.history.push(histEntry);
+    G.score += pts;
+    renderAll();
+    setTimeout(() => endGame(true), 600);
+    return;
+  }
+
+  if (newPos > G.ladderSize) {
+    // Bounce
+    newPos = G.ladderSize - (newPos - G.ladderSize);
+    document.getElementById('dice-msg').textContent += ' · Bounced back to ' + (G.ladderSize - newPos) + ' steps from top';
+  }
+
+  G.pos = newPos;
+  G.score += pts;
+  G.history.push(histEntry);
+
+  // Check if we've run out of pre-generated throws
+  if (G.throwIdx >= G.throws.length) {
+    G.history.push({ isGameEnd:true, gameWon:false, diff:0, skipped:true });
+    endGame(false);
+    return;
+  }
+
+  // Next throw
+  G.pickedOutcome = null;
+  G.pickedDiff = null;
+  G.phase = 'predict';
+
+  renderAll();
+  enableInputs();
+  resetButtons();
+}
+
+function skipThrow() {
+  if (G.phase !== 'predict' || G.todayDone) return;
+  G.pickedOutcome = null;
+  G.pickedDiff = null;
+  revealThrow();
+}
+
+// ── GAME END ───────────────────────────────────────────
+
+function endGame(won) {
+  G.phase = 'done';
+  G.todayDone = true;
+  G.gameWon = won;
+
+  // Update stats
+  G.played++;
+  if (won) G.streak++;
+  else G.streak = 0;
+  if (G.score > G.best) G.best = G.score;
+  G.todayResult = buildShareString();
+  saveStats();
+  renderStats();
+
+  disableInputs();
+  document.getElementById('btn-reveal').disabled = true;
+  document.getElementById('btn-skip').disabled = true;
+
+  // Build result overlay
+  const box = document.getElementById('result-box');
+  document.getElementById('r-icon').textContent = won ? '🏆' : '💀';
+  document.getElementById('r-title').textContent = won ? 'MADE IT!' : 'WIPED OUT!';
+  document.getElementById('r-sub').textContent = won
+    ? 'The shooter reached the top in ' + G.throwIdx + ' throw' + (G.throwIdx===1?'':'s') + '.'
+    : 'A double ended it' + (G.throwIdx <= 2 ? ' early — brutal.' : ' after ' + G.throwIdx + ' throws.');
+  document.getElementById('r-score').textContent = G.score + ' pts today';
+  box.className = 'result-box' + (won ? '' : ' lose');
+
+  // Share card
+  const dayStr = 'LaScala Daily #' + (dayNum + 1);
+  const zoneStr = getZone(G.startSteps).name;
+  document.getElementById('share-line').textContent = dayStr + ' · ' + zoneStr + ' · ' + (won ? 'MADE IT 🏆' : 'WIPED OUT 💀');
+  document.getElementById('share-emojis').textContent = buildEmojiString();
+
+  setTimeout(() => {
+    document.getElementById('result-overlay').classList.add('show');
+    if (won) launchConfetti();
+  }, 800);
+}
+
+function buildEmojiString() {
+  return G.history.map(h => {
+    if (h.isHedge) return '💛';
+    if (h.isGameEnd) {
+      if (h.gameWon) return h.outcomeResult === 'correct' ? '🟩' : '🏆';
+      return h.outcomeResult === 'correct' ? '🟩' : '🟥';
+    }
+    if (h.diffResult === 'correct') return '🟩';
+    if (h.diffResult === 'wrong') return '🟥';
+    if (h.skipped) return '⬜';
+    return '⬛';
+  }).join('');
+}
+
+function buildShareString() {
+  const dayStr = 'LaScala Daily #' + (dayNum + 1);
+  const zoneStr = getZone(G.startSteps).name;
+  const result = G.gameWon ? 'MADE IT 🏆' : 'WIPED OUT 💀';
+  const emojis = buildEmojiString();
+  return dayStr + ' · ' + zoneStr + ' · ' + result + '\n' + emojis + '\n' + G.score + ' pts\ncarcophony.github.io/lascala/lascala-daily.html';
+}
+
+function shareResult() {
+  const text = buildShareString();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.btn-share');
+      btn.textContent = '✓ COPIED!';
+      setTimeout(() => btn.textContent = '📋 COPY RESULT', 2000);
+    });
+  } else {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+}
+
+function closeResult() {
+  document.getElementById('result-overlay').classList.remove('show');
+}
+
+// ── ALREADY PLAYED ─────────────────────────────────────
+
+function showAlreadyPlayed() {
+  // Show the result from today without replaying
+  document.getElementById('dice-msg').textContent = 'You\'ve already played today. Come back tomorrow!';
+  document.getElementById('btn-reveal').disabled = true;
+  document.getElementById('btn-skip').disabled = true;
+  disableInputs();
+  renderStats();
+
+  if (G.todayResult) {
+    const box = document.getElementById('result-box');
+    document.getElementById('r-icon').textContent = '📋';
+    document.getElementById('r-title').textContent = 'PLAYED TODAY';
+    document.getElementById('r-sub').textContent = 'Here\'s your result from today. Come back tomorrow for a new game.';
+    document.getElementById('r-score').textContent = G.score + ' pts';
+    box.className = 'result-box';
+
+    const lines = G.todayResult.split('\n');
+    document.getElementById('share-line').textContent = lines[0] || '';
+    document.getElementById('share-emojis').textContent = lines[1] || '';
+
+    setTimeout(() => document.getElementById('result-overlay').classList.add('show'), 500);
+  }
+}
+
+// ── HELPERS ────────────────────────────────────────────
+
+function disableInputs() {
+  ['btn-make','btn-dont'].forEach(id => document.getElementById(id).disabled = true);
+  for (let i=0;i<=5;i++) document.getElementById('dbtn-'+i).disabled = true;
+}
+
+function enableInputs() {
+  ['btn-make','btn-dont'].forEach(id => document.getElementById(id).disabled = false);
+  for (let i=0;i<=5;i++) document.getElementById('dbtn-'+i).disabled = false;
+}
+
+function resetButtons() {
+  ['btn-make','btn-dont'].forEach(id => document.getElementById(id).classList.remove('chosen'));
+  for (let i=0;i<=5;i++) document.getElementById('dbtn-'+i).classList.remove('chosen');
+}
+
+// ── COUNTDOWN ──────────────────────────────────────────
+
+function updateCountdown() {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setUTCHours(0,0,0,0);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const diff = tomorrow - now;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('countdown').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+// ── CONFETTI ───────────────────────────────────────────
+
+function launchConfetti() {
+  const cols = ['#c9a84c','#f0c840','#2dc653','#4cc9f0','#ffffff','#e63946'];
+  for (let i=0;i<70;i++) {
+    const el = document.createElement('div');
+    el.className = 'cf';
+    el.style.left = Math.random()*100+'vw';
+    el.style.background = cols[Math.floor(Math.random()*cols.length)];
+    el.style.borderRadius = Math.random()>.5?'50%':'0';
+    el.style.width = el.style.height = (5+Math.random()*8)+'px';
+    el.style.animationDuration = (1.5+Math.random()*2)+'s';
+    el.style.animationDelay = Math.random()*.5+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 4000);
+  }
+}
+
+// ── INFO ───────────────────────────────────────────────
+
+function openInfo() { document.getElementById('info-overlay').classList.add('show'); }
+function closeInfo() { document.getElementById('info-overlay').classList.remove('show'); }
+
+// ── INIT ───────────────────────────────────────────────
+
+function init() {
+  loadStats();
+
+  // Set day badge
+  document.getElementById('day-badge').textContent = '#' + String(dayNum + 1).padStart(3,'0');
+
+  renderAll();
+
+  if (G.todayDone) {
+    showAlreadyPlayed();
+  } else {
+    document.getElementById('dice-msg').textContent =
+      'Predict before each throw. Reveal when ready.';
+  }
+
+  // Start countdown
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+}
+
+init();
+</script>
+</body>
+</html>
