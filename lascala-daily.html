@@ -891,9 +891,10 @@ const DIFF_SCORE = [50, 30, 40, 50, 70, 100]; // bonus pts for rarer diffs
 // Every player on every device gets the exact same game today
 
 function getDayNumber() {
-  const epoch = new Date('2025-01-01T00:00:00Z');
+  // Epoch set to match LaScala Daily launch — game numbers start at #1
+  const epoch = new Date('2026-03-26T00:00:00Z');
   const now = new Date();
-  return Math.floor((now - epoch) / (1000 * 60 * 60 * 24));
+  return Math.max(0, Math.floor((now - epoch) / (1000 * 60 * 60 * 24)));
 }
 
 function seededRandom(seed) {
@@ -913,9 +914,10 @@ function generateDailyGame(dayNum) {
   const ladderIdx = Math.floor(seededRandom(seed++) * ladderOptions.length);
   const ladderSize = ladderOptions[ladderIdx];
 
-  // Start position: 4 to ladderSize-1 steps from top
-  const minSteps = 4;
-  const maxSteps = ladderSize - 1;
+  // Start position: 7 to ladderSize-1 steps from top
+  // Minimum 7 ensures at least SHORT zone — enough for a proper game
+  const minSteps = 7;
+  const maxSteps = Math.min(ladderSize - 1, 15);
   const startSteps = minSteps + Math.floor(seededRandom(seed++) * (maxSteps - minSteps + 1));
   const startPos = ladderSize - startSteps; // actual position on ladder
 
@@ -1178,7 +1180,10 @@ function revealThrow() {
   if (G.phase !== 'predict' || G.todayDone) return;
 
   G.phase = 'revealing';
-  disableInputs();
+  // Don't disable bet buttons during reveal — they'll be blocked
+  // by phase check anyway and re-enabling was causing the grey bug
+  document.getElementById('btn-reveal').disabled = true;
+  document.getElementById('btn-skip').disabled = true;
 
   const [d1, d2] = G.throws[G.throwIdx];
   const diff = Math.abs(d1 - d2);
@@ -1297,13 +1302,16 @@ function resolveThrow(d1, d2, diff) {
     return;
   }
 
-  // Next throw
+  // Next throw — reset predictions and re-enable all buttons
   G.pickedOutcome = null;
   G.pickedDiff = null;
   G.phase = 'predict';
 
   renderAll();
+  // Explicitly re-enable everything
   enableInputs();
+  document.getElementById('btn-reveal').disabled = false;
+  document.getElementById('btn-skip').disabled = false;
   resetButtons();
 }
 
@@ -1330,7 +1338,9 @@ function endGame(won) {
   saveStats();
   renderStats();
 
-  disableInputs();
+  document.getElementById('btn-make').disabled = true;
+  document.getElementById('btn-dont').disabled = true;
+  for(let i=0;i<=5;i++) document.getElementById('dbtn-'+i).disabled = true;
   document.getElementById('btn-reveal').disabled = true;
   document.getElementById('btn-skip').disabled = true;
 
@@ -1408,7 +1418,9 @@ function showAlreadyPlayed() {
   document.getElementById('dice-msg').textContent = 'You\'ve already played today. Come back tomorrow!';
   document.getElementById('btn-reveal').disabled = true;
   document.getElementById('btn-skip').disabled = true;
-  disableInputs();
+  document.getElementById('btn-make').disabled = true;
+  document.getElementById('btn-dont').disabled = true;
+  for(let i=0;i<=5;i++) document.getElementById('dbtn-'+i).disabled = true;
   renderStats();
 
   if (G.todayResult) {
@@ -1505,6 +1517,13 @@ function init() {
 
   // Set day badge
   document.getElementById('day-badge').textContent = '#' + String(dayNum + 1).padStart(3,'0');
+  // Shift-click day badge to reset today's result (for testing)
+  document.getElementById('day-badge').addEventListener('click', function(e) {
+    if (e.shiftKey) {
+      try { localStorage.removeItem('lascala_daily_stats'); } catch(err){}
+      location.reload();
+    }
+  });
 
   // Wire up all buttons with cross-platform tap handler
   addTap('btn-make', () => pickOutcome('make'));
