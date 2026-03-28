@@ -506,108 +506,108 @@ const POLE_CREDIT_SECS = 0;                      // Pole position time credit in
 // DRIVER DECK — 50 drivers, 6 stats each
 // Stats: wins (race wins), poles (pole positions), titles (WDC titles),
 //        seasons (F1 seasons raced), podiums (total podiums), networth (est. $M)
+// Stats: wins, poles, titles, seasons, podiums, networth, fastlaps, dnfs, points, debut
 const DRIVER_DECK = [
   { name:'Lewis Hamilton', flag:'🇬🇧', team:'Mercedes / Ferrari', helmet:{base:'#00D2BE',stripe:'#fff',visor:'#222'},
-    stats:{ wins:105, poles:104, titles:7, seasons:19, podiums:203, networth:350 }},
+    stats:{ wins:105, poles:104, titles:7, seasons:19, podiums:203, networth:350, fastlaps:67, dnfs:49, points:4907, debut:2007 }},
   { name:'Michael Schumacher', flag:'🇩🇪', team:'Ferrari / Benetton', helmet:{base:'#e8132a',stripe:'#fff',visor:'#111'},
-    stats:{ wins:91, poles:68, titles:7, seasons:19, podiums:155, networth:600 }},
+    stats:{ wins:91, poles:68, titles:7, seasons:19, podiums:155, networth:600, fastlaps:77, dnfs:55, points:1566, debut:1991 }},
   { name:'Ayrton Senna', flag:'🇧🇷', team:'McLaren / Lotus', helmet:{base:'#009c3b',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:41, poles:65, titles:3, seasons:10, podiums:80, networth:400 }},
+    stats:{ wins:41, poles:65, titles:3, seasons:10, podiums:80, networth:400, fastlaps:19, dnfs:43, points:614, debut:1984 }},
   { name:'Alain Prost', flag:'🇫🇷', team:'McLaren / Ferrari', helmet:{base:'#0055A4',stripe:'#EF4135',visor:'#222'},
-    stats:{ wins:51, poles:33, titles:4, seasons:13, podiums:106, networth:180 }},
+    stats:{ wins:51, poles:33, titles:4, seasons:13, podiums:106, networth:180, fastlaps:41, dnfs:42, points:798, debut:1980 }},
   { name:'Max Verstappen', flag:'🇳🇱', team:'Red Bull', helmet:{base:'#1e3a8a',stripe:'#f97316',visor:'#111'},
-    stats:{ wins:63, poles:44, titles:4, seasons:10, podiums:114, networth:60 }},
+    stats:{ wins:63, poles:44, titles:4, seasons:10, podiums:114, networth:60, fastlaps:32, dnfs:38, points:2960, debut:2015 }},
   { name:'Sebastian Vettel', flag:'🇩🇪', team:'Red Bull / Ferrari', helmet:{base:'#f97316',stripe:'#fff',visor:'#111'},
-    stats:{ wins:53, poles:57, titles:4, seasons:16, podiums:122, networth:140 }},
+    stats:{ wins:53, poles:57, titles:4, seasons:16, podiums:122, networth:140, fastlaps:38, dnfs:48, points:3098, debut:2007 }},
   { name:'Fernando Alonso', flag:'🇪🇸', team:'Renault / Ferrari / Aston Martin', helmet:{base:'#0055A4',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:32, poles:22, titles:2, seasons:22, podiums:106, networth:260 }},
+    stats:{ wins:32, poles:22, titles:2, seasons:22, podiums:106, networth:260, fastlaps:23, dnfs:61, points:2267, debut:2001 }},
   { name:'Nigel Mansell', flag:'🇬🇧', team:'Williams / Ferrari', helmet:{base:'#012169',stripe:'#C8102E',visor:'#222'},
-    stats:{ wins:31, poles:32, titles:1, seasons:15, podiums:59, networth:50 }},
+    stats:{ wins:31, poles:32, titles:1, seasons:15, podiums:59, networth:50, fastlaps:30, dnfs:70, points:482, debut:1980 }},
   { name:'Niki Lauda', flag:'🇦🇹', team:'Ferrari / McLaren', helmet:{base:'#EF3340',stripe:'#fff',visor:'#111'},
-    stats:{ wins:25, poles:24, titles:3, seasons:13, podiums:54, networth:500 }},
+    stats:{ wins:25, poles:24, titles:3, seasons:13, podiums:54, networth:500, fastlaps:25, dnfs:49, points:420, debut:1971 }},
   { name:'Damon Hill', flag:'🇬🇧', team:'Williams / Arrows', helmet:{base:'#012169',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:22, poles:20, titles:1, seasons:9, podiums:42, networth:35 }},
+    stats:{ wins:22, poles:20, titles:1, seasons:9, podiums:42, networth:35, fastlaps:19, dnfs:27, points:360, debut:1992 }},
   { name:'Jenson Button', flag:'🇬🇧', team:'Brawn / McLaren / Honda', helmet:{base:'#fff',stripe:'#e8132a',visor:'#111'},
-    stats:{ wins:15, poles:8, titles:1, seasons:17, podiums:50, networth:150 }},
+    stats:{ wins:15, poles:8, titles:1, seasons:17, podiums:50, networth:150, fastlaps:8, dnfs:58, points:1235, debut:2000 }},
   { name:'Mika Häkkinen', flag:'🇫🇮', team:'McLaren', helmet:{base:'#C8102E',stripe:'#fff',visor:'#222'},
-    stats:{ wins:20, poles:26, titles:2, seasons:9, podiums:51, networth:60 }},
+    stats:{ wins:20, poles:26, titles:2, seasons:9, podiums:51, networth:60, fastlaps:25, dnfs:35, points:420, debut:1991 }},
   { name:'Kimi Räikkönen', flag:'🇫🇮', team:'Ferrari / McLaren / Lotus', helmet:{base:'#e8132a',stripe:'#fff',visor:'#111'},
-    stats:{ wins:21, poles:18, titles:1, seasons:19, podiums:103, networth:150 }},
+    stats:{ wins:21, poles:18, titles:1, seasons:19, podiums:103, networth:150, fastlaps:46, dnfs:68, points:1873, debut:2001 }},
   { name:'Eddie Irvine', flag:'🇬🇧', team:'Ferrari / Jaguar', helmet:{base:'#006400',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:4, poles:0, titles:0, seasons:10, podiums:26, networth:120 }},
+    stats:{ wins:4, poles:0, titles:0, seasons:10, podiums:26, networth:120, fastlaps:1, dnfs:42, points:191, debut:1993 }},
   { name:'James Hunt', flag:'🇬🇧', team:'McLaren / Hesketh', helmet:{base:'#C8102E',stripe:'#fff',visor:'#222'},
-    stats:{ wins:10, poles:14, titles:1, seasons:8, podiums:23, networth:10 }},
+    stats:{ wins:10, poles:14, titles:1, seasons:8, podiums:23, networth:10, fastlaps:8, dnfs:42, points:179, debut:1973 }},
   { name:'Juan Manuel Fangio', flag:'🇦🇷', team:'Ferrari / Mercedes / Maserati', helmet:{base:'#74acdf',stripe:'#fff',visor:'#333'},
-    stats:{ wins:24, poles:29, titles:5, seasons:8, podiums:35, networth:10 }},
+    stats:{ wins:24, poles:29, titles:5, seasons:8, podiums:35, networth:10, fastlaps:23, dnfs:18, points:277, debut:1950 }},
   { name:'HH Frentzen', flag:'🇩🇪', team:'Williams / Jordan / Sauber', helmet:{base:'#888',stripe:'#fff',visor:'#222'},
-    stats:{ wins:3, poles:2, titles:0, seasons:11, podiums:18, networth:8 }},
+    stats:{ wins:3, poles:2, titles:0, seasons:11, podiums:18, networth:8, fastlaps:6, dnfs:46, points:174, debut:1994 }},
   { name:'Lando Norris', flag:'🇬🇧', team:'McLaren', helmet:{base:'#FF8000',stripe:'#fff',visor:'#111'},
-    stats:{ wins:5, poles:10, titles:0, seasons:6, podiums:34, networth:23 }},
-  { name:'Jackie Stewart', flag:'🇬🇧', team:'Tyrrell / Matra', helmet:{base:'#012169',stripe:'#ffdf00',visor:'#333'},
-    stats:{ wins:27, poles:17, titles:3, seasons:9, podiums:43, networth:60 }},
+    stats:{ wins:5, poles:10, titles:0, seasons:6, podiums:34, networth:23, fastlaps:8, dnfs:18, points:1026, debut:2019 }},
+  { name:'Jackie Stewart', flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', team:'Tyrrell / Matra', helmet:{base:'#012169',stripe:'#ffdf00',visor:'#333'},
+    stats:{ wins:27, poles:17, titles:3, seasons:9, podiums:43, networth:60, fastlaps:15, dnfs:30, points:360, debut:1965 }},
   { name:'Emerson Fittipaldi', flag:'🇧🇷', team:'Lotus / McLaren', helmet:{base:'#009c3b',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:14, poles:6, titles:2, seasons:10, podiums:35, networth:20 }},
-  // — New entries from here —
+    stats:{ wins:14, poles:6, titles:2, seasons:10, podiums:35, networth:20, fastlaps:6, dnfs:29, points:281, debut:1970 }},
   { name:'Carlos Sainz Jr', flag:'🇪🇸', team:'Ferrari / McLaren / Williams', helmet:{base:'#e8132a',stripe:'#ffdf00',visor:'#111'},
-    stats:{ wins:3, poles:5, titles:0, seasons:10, podiums:23, networth:20 }},
+    stats:{ wins:3, poles:5, titles:0, seasons:10, podiums:23, networth:20, fastlaps:5, dnfs:28, points:1021, debut:2015 }},
   { name:'Charles Leclerc', flag:'🇲🇨', team:'Ferrari', helmet:{base:'#e8132a',stripe:'#fff',visor:'#111'},
-    stats:{ wins:8, poles:25, titles:0, seasons:7, podiums:42, networth:30 }},
+    stats:{ wins:8, poles:25, titles:0, seasons:7, podiums:42, networth:30, fastlaps:8, dnfs:26, points:1404, debut:2018 }},
   { name:'George Russell', flag:'🇬🇧', team:'Mercedes / Williams', helmet:{base:'#00D2BE',stripe:'#fff',visor:'#222'},
-    stats:{ wins:3, poles:4, titles:0, seasons:7, podiums:18, networth:12 }},
+    stats:{ wins:3, poles:4, titles:0, seasons:7, podiums:18, networth:12, fastlaps:7, dnfs:14, points:638, debut:2019 }},
   { name:'Oscar Piastri', flag:'🇦🇺', team:'McLaren', helmet:{base:'#FF8000',stripe:'#fff',visor:'#111'},
-    stats:{ wins:3, poles:3, titles:0, seasons:3, podiums:15, networth:8 }},
+    stats:{ wins:3, poles:3, titles:0, seasons:3, podiums:15, networth:8, fastlaps:4, dnfs:5, points:482, debut:2023 }},
   { name:'Rubens Barrichello', flag:'🇧🇷', team:'Ferrari / Williams / Brawn', helmet:{base:'#009c3b',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:11, poles:14, titles:0, seasons:19, podiums:68, networth:30 }},
+    stats:{ wins:11, poles:14, titles:0, seasons:19, podiums:68, networth:30, fastlaps:17, dnfs:62, points:658, debut:1993 }},
   { name:'Romain Grosjean', flag:'🇨🇭', team:'Haas / Lotus / Renault', helmet:{base:'#E8002D',stripe:'#fff',visor:'#111'},
-    stats:{ wins:0, poles:0, titles:0, seasons:9, podiums:10, networth:8 }},
+    stats:{ wins:0, poles:0, titles:0, seasons:9, podiums:10, networth:8, fastlaps:1, dnfs:45, points:391, debut:2009 }},
   { name:'Ralf Schumacher', flag:'🇩🇪', team:'Williams / Toyota', helmet:{base:'#005EB8',stripe:'#fff',visor:'#111'},
-    stats:{ wins:6, poles:6, titles:0, seasons:11, podiums:27, networth:40 }},
+    stats:{ wins:6, poles:6, titles:0, seasons:11, podiums:27, networth:40, fastlaps:8, dnfs:43, points:329, debut:1997 }},
   { name:'Nelson Piquet', flag:'🇧🇷', team:'Brabham / Williams / Lotus', helmet:{base:'#009c3b',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:23, poles:24, titles:3, seasons:17, podiums:60, networth:50 }},
+    stats:{ wins:23, poles:24, titles:3, seasons:17, podiums:60, networth:50, fastlaps:23, dnfs:67, points:485, debut:1978 }},
   { name:'Gilles Villeneuve', flag:'🇨🇦', team:'Ferrari', helmet:{base:'#e8132a',stripe:'#fff',visor:'#111'},
-    stats:{ wins:6, poles:2, titles:0, seasons:5, podiums:13, networth:5 }},
+    stats:{ wins:6, poles:2, titles:0, seasons:5, podiums:13, networth:5, fastlaps:8, dnfs:23, points:107, debut:1977 }},
   { name:'Jim Clark', flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', team:'Lotus', helmet:{base:'#006400',stripe:'#ffdf00',visor:'#333'},
-    stats:{ wins:25, poles:33, titles:2, seasons:8, podiums:32, networth:5 }},
+    stats:{ wins:25, poles:33, titles:2, seasons:8, podiums:32, networth:5, fastlaps:28, dnfs:22, points:274, debut:1960 }},
   { name:'Stirling Moss', flag:'🇬🇧', team:'Vanwall / Mercedes / Maserati', helmet:{base:'#006400',stripe:'#fff',visor:'#333'},
-    stats:{ wins:16, poles:16, titles:0, seasons:14, podiums:24, networth:15 }},
+    stats:{ wins:16, poles:16, titles:0, seasons:14, podiums:24, networth:15, fastlaps:20, dnfs:42, points:186, debut:1951 }},
   { name:'Graham Hill', flag:'🇬🇧', team:'Lotus / BRM', helmet:{base:'#012169',stripe:'#fff',visor:'#333'},
-    stats:{ wins:14, poles:13, titles:2, seasons:18, podiums:36, networth:5 }},
+    stats:{ wins:14, poles:13, titles:2, seasons:18, podiums:36, networth:5, fastlaps:10, dnfs:64, points:289, debut:1958 }},
   { name:'Jack Brabham', flag:'🇦🇺', team:'Brabham / Cooper', helmet:{base:'#006400',stripe:'#ffdf00',visor:'#333'},
-    stats:{ wins:14, poles:13, titles:3, seasons:16, podiums:31, networth:10 }},
+    stats:{ wins:14, poles:13, titles:3, seasons:16, podiums:31, networth:10, fastlaps:12, dnfs:53, points:261, debut:1955 }},
   { name:'Jochen Rindt', flag:'🇦🇹', team:'Lotus / Brabham', helmet:{base:'#fff',stripe:'#000',visor:'#222'},
-    stats:{ wins:6, poles:10, titles:1, seasons:6, podiums:13, networth:5 }},
+    stats:{ wins:6, poles:10, titles:1, seasons:6, podiums:13, networth:5, fastlaps:3, dnfs:24, points:109, debut:1964 }},
   { name:'Mario Andretti', flag:'🇺🇸', team:'Lotus / Ferrari / Parnelli', helmet:{base:'#B22222',stripe:'#fff',visor:'#222'},
-    stats:{ wins:12, poles:18, titles:1, seasons:14, podiums:19, networth:50 }},
+    stats:{ wins:12, poles:18, titles:1, seasons:14, podiums:19, networth:50, fastlaps:10, dnfs:53, points:180, debut:1968 }},
   { name:'Jody Scheckter', flag:'🇿🇦', team:'Ferrari / Wolf / Tyrrell', helmet:{base:'#009c3b',stripe:'#fff',visor:'#222'},
-    stats:{ wins:10, poles:3, titles:1, seasons:9, podiums:33, networth:200 }},
+    stats:{ wins:10, poles:3, titles:1, seasons:9, podiums:33, networth:200, fastlaps:3, dnfs:30, points:255, debut:1972 }},
   { name:'Carlos Reutemann', flag:'🇦🇷', team:'Williams / Brabham / Ferrari', helmet:{base:'#74acdf',stripe:'#fff',visor:'#222'},
-    stats:{ wins:12, poles:6, titles:0, seasons:12, podiums:45, networth:20 }},
+    stats:{ wins:12, poles:6, titles:0, seasons:12, podiums:45, networth:20, fastlaps:6, dnfs:46, points:310, debut:1972 }},
   { name:'Gerhard Berger', flag:'🇦🇹', team:'Ferrari / McLaren / Benetton', helmet:{base:'#EF3340',stripe:'#fff',visor:'#111'},
-    stats:{ wins:10, poles:12, titles:0, seasons:14, podiums:48, networth:30 }},
+    stats:{ wins:10, poles:12, titles:0, seasons:14, podiums:48, networth:30, fastlaps:21, dnfs:55, points:385, debut:1984 }},
   { name:'David Coulthard', flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', team:'McLaren / Williams / Red Bull', helmet:{base:'#C8102E',stripe:'#005EB8',visor:'#222'},
-    stats:{ wins:13, poles:12, titles:0, seasons:15, podiums:62, networth:65 }},
+    stats:{ wins:13, poles:12, titles:0, seasons:15, podiums:62, networth:65, fastlaps:18, dnfs:50, points:535, debut:1994 }},
   { name:'Mick Schumacher', flag:'🇩🇪', team:'Haas', helmet:{base:'#e8132a',stripe:'#fff',visor:'#111'},
-    stats:{ wins:0, poles:0, titles:0, seasons:3, podiums:0, networth:5 }},
+    stats:{ wins:0, poles:0, titles:0, seasons:3, podiums:0, networth:5, fastlaps:0, dnfs:8, points:12, debut:2021 }},
   { name:'Valtteri Bottas', flag:'🇫🇮', team:'Mercedes / Williams / Alfa Romeo', helmet:{base:'#00D2BE',stripe:'#fff',visor:'#222'},
-    stats:{ wins:10, poles:20, titles:0, seasons:12, podiums:67, networth:25 }},
+    stats:{ wins:10, poles:20, titles:0, seasons:12, podiums:67, networth:25, fastlaps:19, dnfs:38, points:1797, debut:2013 }},
   { name:'Felipe Massa', flag:'🇧🇷', team:'Ferrari / Williams / Sauber', helmet:{base:'#009c3b',stripe:'#ffdf00',visor:'#222'},
-    stats:{ wins:11, poles:16, titles:0, seasons:16, podiums:41, networth:20 }},
+    stats:{ wins:11, poles:16, titles:0, seasons:16, podiums:41, networth:20, fastlaps:15, dnfs:50, points:1167, debut:2002 }},
   { name:'Mark Webber', flag:'🇦🇺', team:'Red Bull / Williams / Jaguar', helmet:{base:'#1e3a8a',stripe:'#f97316',visor:'#111'},
-    stats:{ wins:9, poles:13, titles:0, seasons:13, podiums:42, networth:30 }},
+    stats:{ wins:9, poles:13, titles:0, seasons:13, podiums:42, networth:30, fastlaps:19, dnfs:44, points:1047, debut:2002 }},
   { name:'Robert Kubica', flag:'🇵🇱', team:'BMW Sauber / Renault / Williams', helmet:{base:'#fff',stripe:'#DC143C',visor:'#222'},
-    stats:{ wins:1, poles:1, titles:0, seasons:10, podiums:12, networth:15 }},
+    stats:{ wins:1, poles:1, titles:0, seasons:10, podiums:12, networth:15, fastlaps:1, dnfs:25, points:273, debut:2006 }},
   { name:'Nico Rosberg', flag:'🇩🇪', team:'Mercedes / Williams', helmet:{base:'#00D2BE',stripe:'#fff',visor:'#222'},
-    stats:{ wins:23, poles:30, titles:1, seasons:11, podiums:57, networth:50 }},
+    stats:{ wins:23, poles:30, titles:1, seasons:11, podiums:57, networth:50, fastlaps:20, dnfs:31, points:1594, debut:2006 }},
   { name:'Daniel Ricciardo', flag:'🇦🇺', team:'Red Bull / Renault / McLaren', helmet:{base:'#1e3a8a',stripe:'#ffdf00',visor:'#111'},
-    stats:{ wins:8, poles:3, titles:0, seasons:14, podiums:32, networth:50 }},
+    stats:{ wins:8, poles:3, titles:0, seasons:14, podiums:32, networth:50, fastlaps:16, dnfs:44, points:1311, debut:2011 }},
   { name:'Esteban Ocon', flag:'🇫🇷', team:'Alpine / Force India / Mercedes', helmet:{base:'#0055A4',stripe:'#EF4135',visor:'#222'},
-    stats:{ wins:1, poles:0, titles:0, seasons:8, podiums:3, networth:8 }},
+    stats:{ wins:1, poles:0, titles:0, seasons:8, podiums:3, networth:8, fastlaps:2, dnfs:19, points:412, debut:2016 }},
   { name:'Pierre Gasly', flag:'🇫🇷', team:'AlphaTauri / Red Bull / Alpine', helmet:{base:'#0055A4',stripe:'#EF4135',visor:'#222'},
-    stats:{ wins:1, poles:0, titles:0, seasons:7, podiums:3, networth:10 }},
+    stats:{ wins:1, poles:0, titles:0, seasons:7, podiums:3, networth:10, fastlaps:3, dnfs:21, points:456, debut:2017 }},
   { name:'Lance Stroll', flag:'🇨🇦', team:'Aston Martin / Williams / Racing Point', helmet:{base:'#006F62',stripe:'#CEDC00',visor:'#111'},
-    stats:{ wins:0, poles:1, titles:0, seasons:9, podiums:3, networth:10 }},
+    stats:{ wins:0, poles:1, titles:0, seasons:9, podiums:3, networth:10, fastlaps:0, dnfs:26, points:255, debut:2017 }},
   { name:'Sergio Pérez', flag:'🇲🇽', team:'Red Bull / Racing Point / Force India', helmet:{base:'#1e3a8a',stripe:'#006400',visor:'#111'},
-    stats:{ wins:13, poles:3, titles:0, seasons:15, podiums:56, networth:40 }},
+    stats:{ wins:13, poles:3, titles:0, seasons:15, podiums:56, networth:40, fastlaps:14, dnfs:45, points:1834, debut:2011 }},
 ];
 
 // CONSTRUCTOR DECK — 20 teams
@@ -722,12 +722,16 @@ const ENGINE_DECK = [
 
 // CATEGORIES per deck type
 const DRIVER_CATEGORIES = [
-  { key:'wins', label:'Most Race Wins' },
-  { key:'poles', label:'Most Pole Positions' },
-  { key:'titles', label:'Most World Championships' },
-  { key:'seasons', label:'Most F1 Seasons' },
-  { key:'podiums', label:'Most Podiums' },
+  { key:'wins',     label:'Most Race Wins' },
+  { key:'poles',    label:'Most Pole Positions' },
+  { key:'titles',   label:'Most World Championships' },
+  { key:'seasons',  label:'Most F1 Seasons' },
+  { key:'podiums',  label:'Most Podiums' },
   { key:'networth', label:'Highest Net Worth ($M)' },
+  { key:'fastlaps', label:'Most Fastest Laps' },
+  { key:'dnfs',     label:'Most Race Retirements (DNFs)' },
+  { key:'points',   label:'Most Career Points' },
+  { key:'debut',    label:'Earliest F1 Debut Year', lowestWins:true },
 ];
 const CONSTRUCTOR_CATEGORIES = [
   { key:'wins', label:'Most Race Wins' },
@@ -823,8 +827,9 @@ function getDayQuestions() {
   const allQ = [];
   const usedPairs = new Set();
   let attempts = 0;
+  const recentCats = []; // track last 5 categories used
 
-  while (allQ.length < TOTAL_LAPS * QUESTIONS_PER_LAP && attempts < 2000) {
+  while (allQ.length < TOTAL_LAPS * QUESTIONS_PER_LAP && attempts < 5000) {
     attempts++;
     const ai = Math.floor(rng.next() * DECK.length);
     const bi = Math.floor(rng.next() * DECK.length);
@@ -833,6 +838,10 @@ function getDayQuestions() {
 
     if (ai === bi || bi === ci || ai === ci) continue;
     const cat = CATEGORIES[catI];
+
+    // Spacing rule: skip if this category appeared in the last 5 questions
+    if (recentCats.slice(-5).includes(cat.key)) continue;
+
     const vals = [DECK[ai].stats[cat.key], DECK[bi].stats[cat.key], DECK[ci].stats[cat.key]];
     if (vals[0] === vals[1] || vals[1] === vals[2] || vals[0] === vals[2]) continue;
 
@@ -840,8 +849,11 @@ function getDayQuestions() {
     if (usedPairs.has(pairKey)) continue;
     usedPairs.add(pairKey);
 
-    const winnerIdx = vals.indexOf(Math.max(...vals));
+    const winnerIdx = cat.lowestWins
+      ? vals.indexOf(Math.min(...vals))
+      : vals.indexOf(Math.max(...vals));
     allQ.push({ drivers:[DECK[ai],DECK[bi],DECK[ci]], cat, winnerIdx });
+    recentCats.push(cat.key);
   }
   return allQ;
 }
