@@ -350,7 +350,7 @@ html, body {
     <div id="logo">AP<span>EX</span></div>
     <div id="race-info">
       <div id="race-name">British Grand Prix</div>
-      <div id="race-venue">Silverstone · <span id="lap-of">Lap 1 of 10</span></div>
+      <div id="race-venue"><span id="venue-name">Silverstone</span> · <span id="lap-of">Lap 1 of 10</span></div>
     </div>
   </div>
 
@@ -487,11 +487,20 @@ html, body {
 <script>
 const SUPABASE_URL = 'https://eluwjbndjlscixjytrzx.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_xOJRXt2dGCXovTNgDOSOJw_Shrbofuw';
-const RACE_NAME = 'British Grand Prix';
-const TOTAL_LAPS = 10;
-const QUESTIONS_PER_LAP = 5;
-const PENALTY_SECS = 10;
-const ANSWER_PAUSE = 2000;
+
+// ── RACE CONFIGURATION ────────────────────────────────────────────────────────
+// Edit these values to change race parameters
+const RACE_NAME        = 'British Grand Prix';  // Race name (shows on leaderboard)
+const RACE_VENUE       = 'Silverstone';          // Venue name (display only)
+const TOTAL_LAPS       = 10;                     // Number of laps per race
+const QUESTIONS_PER_LAP = 5;                     // Questions per lap
+const PENALTY_SECS     = 10;                     // Seconds added per wrong answer
+const ANSWER_PAUSE     = 2000;                   // Pause between questions (ms) — 2000 = 2 seconds
+const LAP_PAUSE        = true;                   // Show lap complete screen? false = auto-continue
+const LAP_PAUSE_SECS   = 0;                      // Auto-continue after N secs (0 = wait for tap)
+const BEST_TIME_ONLY   = true;                   // Leaderboard shows best time per handle only
+const POLE_CREDIT_SECS = 0;                      // Pole position time credit in seconds (0 = off)
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ── DECK ─────────────────────────────────────────────────────────────────────
 const DECK = [
@@ -659,10 +668,18 @@ async function saveScore() {
 async function fetchLeaderboard() {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/apex_scores?race=eq.${encodeURIComponent(RACE_NAME)}&order=total_time.asc&limit=20`,
+      `${SUPABASE_URL}/rest/v1/apex_scores?race=eq.${encodeURIComponent(RACE_NAME)}&order=total_time.asc&limit=200`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
     );
-    return await res.json();
+    const all = await res.json();
+    // Best time per handle only
+    const best = {};
+    all.forEach(row => {
+      if (!best[row.handle] || row.total_time < best[row.handle].total_time) {
+        best[row.handle] = row;
+      }
+    });
+    return Object.values(best).sort((a,b) => a.total_time - b.total_time).slice(0, 20);
   } catch(e) { return []; }
 }
 
@@ -684,6 +701,7 @@ function startLap() {
   lapElapsed = 0; lapPenalties = 0; lapCorrect = 0;
   answered = false;
   document.getElementById('lap-num').textContent = currentLap;
+  document.getElementById('venue-name').textContent = RACE_VENUE;
   document.getElementById('lap-of').textContent = `Lap ${currentLap} of ${TOTAL_LAPS}`;
   updatePips(-1);
   currentQ = 0;
@@ -862,6 +880,27 @@ async function finishRace() {
   document.getElementById('lap-complete-screen').classList.remove('show');
   gameComplete = true;
   document.getElementById('share-btn').classList.add('visible');
+
+  // Check for personal best BEFORE saving new score
+  let previousBest = null;
+  let isNewPB = false;
+  try {
+    const pbRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/apex_scores?race=eq.${encodeURIComponent(RACE_NAME)}&handle=eq.${encodeURIComponent(handle)}&order=total_time.asc&limit=1`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
+    );
+    const pbData = await pbRes.json();
+    if (pbData && pbData.length > 0) {
+      previousBest = pbData[0].total_time;
+      isNewPB = totalTime < previousBest;
+    } else {
+      isNewPB = true; // First ever time = automatically a PB
+    }
+  } catch(e) { isNewPB = false; }
+
+  window._isNewPB = isNewPB;
+  window._previousBest = previousBest;
+
   await saveScore();
   showResults();
 }
@@ -874,8 +913,17 @@ async function showResults() {
   const myPos = lb.findIndex(r => r.handle === handle) + 1;
   const posLabel = myPos > 0 ? 'P' + myPos : 'P—';
 
-  const resultLabel = myPos === 1 ? 'RACE WINNER!' : myPos <= 3 ? 'PODIUM FINISH!' : myPos <= 10 ? 'POINTS FINISH' : 'CLASSIFIED';
-  const headerBg = myPos === 1 ? '#c9a84c' : myPos <= 3 ? '#1a6e2e' : myPos <= 10 ? '#185FA5' : '#555';
+  const isNewPB = window._isNewPB || false;
+  const previousBest = window._previousBest || null;
+  const pbDiff = previousBest ? (previousBest - totalTime).toFixed(1) : null;
+
+  let resultLabel, headerBg;
+  if (isNewPB && myPos === 1) { resultLabel = 'RACE WINNER!'; headerBg = '#c9a84c'; }
+  else if (isNewPB) { resultLabel = 'NEW BEST TIME!'; headerBg = '#1a6e2e'; }
+  else if (myPos === 1) { resultLabel = 'RACE WINNER!'; headerBg = '#c9a84c'; }
+  else if (myPos <= 3) { resultLabel = 'PODIUM FINISH!'; headerBg = '#1a6e2e'; }
+  else if (myPos <= 10) { resultLabel = 'POINTS FINISH'; headerBg = '#185FA5'; }
+  else { resultLabel = 'CLASSIFIED'; headerBg = '#555'; }
 
   document.getElementById('res-title').textContent = resultLabel;
   document.getElementById('res-sub').textContent = `${RACE_NAME} · ${handle}`;
@@ -885,11 +933,26 @@ async function showResults() {
   document.getElementById('res-correct').textContent = totalCorrect + '/' + (TOTAL_LAPS * QUESTIONS_PER_LAP);
   document.getElementById('pos-value').textContent = posLabel;
 
+  // PB message
+  let pbLine = '';
+  if (isNewPB && previousBest) {
+    pbLine = `\n⚡ New personal best! ${pbDiff}s faster than your previous time`;
+  } else if (isNewPB) {
+    pbLine = '\n⚡ First time at this circuit — time to beat it!';
+  } else if (previousBest) {
+    pbLine = `\nPrevious best: ${formatTime(previousBest)}`;
+  }
+
   // Share card
   const emojiStr = shareEmoji.join('');
-  const shareText = `APEX · ${RACE_NAME}\n${handle} · ${posLabel}\n${formatTime(totalTime)} · ${totalCorrect}/${TOTAL_LAPS * QUESTIONS_PER_LAP} correct\n${emojiStr}\napex.game`;
+  let shareText;
+  if (isNewPB && previousBest) {
+    shareText = `APEX · ${RACE_NAME}\n${handle} · ${posLabel} · NEW PB!\n${formatTime(totalTime)} (${pbDiff}s faster) · ${totalCorrect}/${TOTAL_LAPS * QUESTIONS_PER_LAP} correct\n${emojiStr}\napex.game`;
+  } else {
+    shareText = `APEX · ${RACE_NAME}\n${handle} · ${posLabel}\n${formatTime(totalTime)} · ${totalCorrect}/${TOTAL_LAPS * QUESTIONS_PER_LAP} correct\n${emojiStr}\napex.game`;
+  }
   document.getElementById('sp-emoji').textContent = emojiStr;
-  document.getElementById('sp-text').textContent = `${posLabel} · ${formatTime(totalTime)} · ${totalCorrect}/${TOTAL_LAPS*QUESTIONS_PER_LAP} correct`;
+  document.getElementById('sp-text').textContent = `${posLabel} · ${formatTime(totalTime)}${pbLine}\n${totalCorrect}/${TOTAL_LAPS*QUESTIONS_PER_LAP} correct`;
   document.getElementById('res-header').dataset.share = shareText;
 
   // Leaderboard
